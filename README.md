@@ -4,10 +4,9 @@
 ---
 
 ## 🎥 Demo
-<!-- 🔗 **Pitch Video:** [Add your pitch video link]   -->
 💻 **Screen Recording Demo:**
-> [![Pitch Video](https://img.youtube.com/vi/your_video_id/0.jpg)](https://youtu.be/O3J9IdBCyEE)  
-
+<video src="assets/Demo_PrivGPT-Studio.mp4" controls width="800"></video>
+▶️ [Watch the Demo on YouTube](https://youtu.be/OoHNVjYpup8)
 
 ---
 
@@ -121,6 +120,10 @@ privgpt-studio/
 ├── server/          # Flask backend
 │   ├── app.py
 │   ├── requirements.txt
+│   └── ...
+│
+├── assets/          
+│   ├── Demo_PrivGPT-Studio.mp4
 │   └── ...
 │
 └── README.md
