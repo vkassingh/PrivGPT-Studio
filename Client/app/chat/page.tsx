@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import ReactMarkdown from "react-markdown";
-import remarkBreaks from "remark-breaks";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -168,8 +166,9 @@ export default function ChatPage() {
         localStorage.getItem("chat_sessions") || "[]"
       );
 
+      // ✅ If no previous sessions, just show welcome
       if (storedSessions.length === 0) {
-        setSessionId(welcomeSession.id);
+        setSessionId(welcomeSession.id); // "1"
         setMessages([welcomeMessage]);
         setChatSessions([welcomeSession]);
         if (newChatSessionBtnRef.current) {
@@ -207,11 +206,24 @@ export default function ChatPage() {
             }
           );
 
-          setSessionId(sessions[0]._id);
-          setChatSessions(transformedSessions);
+          // ✅ Always keep welcomeSession first in the list
+          setChatSessions([welcomeSession, ...transformedSessions]);
 
-          // Load messages for latest chat session
-          const formattedMessages: Message[] = sessions[0].messages?.map(
+          // ✅ Only reset to welcomeSession if you are currently on it
+          if (sessionId === welcomeSession.id || !sessionId) {
+            setSessionId(welcomeSession.id); // stays as "1"
+            if (newChatSessionBtnRef.current)
+              newChatSessionBtnRef.current.disabled = true;
+
+            // show only welcome message if welcome is selected
+            setMessages([welcomeMessage]);
+            return;
+          }
+
+          // ✅ Otherwise, load messages for currently active sessionId
+          const activeSession =
+            sessions.find((s: any) => s._id === sessionId) || sessions[0];
+          const formattedMessages: Message[] = activeSession.messages?.map(
             (msg: any, index: number) => ({
               id: msg.id || (index + 2).toString(),
               content: msg.content,
@@ -230,11 +242,8 @@ export default function ChatPage() {
             })
           );
 
-          if (formattedMessages && formattedMessages[0]?.timestamp) {
-            welcomeMessage.timestamp = formattedMessages[0].timestamp;
-          }
-
-          setMessages([welcomeMessage, ...formattedMessages]);
+          // ✅ Put welcomeMessage on top of history
+          setMessages([welcomeMessage, ...(formattedMessages || [])]);
         }
       } catch (error) {
         console.error("Failed to fetch session history:", error);
@@ -242,7 +251,23 @@ export default function ChatPage() {
     };
 
     fetchChatSessionHistory();
-  }, []);
+  }, [sessionId, editedName]);
+  if (newChatSessionBtnRef.current) {
+    newChatSessionBtnRef.current.disabled = true;
+  }
+  useEffect(() => {
+    if (chatSessions.some((session) => session.id === "1")) {
+      // welcomeSession exists, disable new chat button
+      if (newChatSessionBtnRef.current) {
+        newChatSessionBtnRef.current.disabled = true;
+      }
+    } else {
+      // no welcome session, allow new chat
+      if (newChatSessionBtnRef.current) {
+        newChatSessionBtnRef.current.disabled = false;
+      }
+    }
+  }, [chatSessions]);
 
   useEffect(() => {
     let wasOffline = false; // track previous state
@@ -273,22 +298,19 @@ export default function ChatPage() {
 
     return () => clearInterval(interval);
   }, [localModels, selectedModelType]); // Add selectedModelType to dependencies
-  
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
     // remove backslashes added by react-mentions markup
     const unescapedInput = input.replace(/\\([\[\]\(\)])/g, "$1");
-    console.log("unescapedInput:", unescapedInput);
 
     const mentionMatches = [...unescapedInput.matchAll(/@\[(.*?)\]\((.*?)\)/g)];
     const mentionIds = mentionMatches.map((m) => m[2]);
-    console.log("Extracted mention session IDs:", mentionIds);
 
     const messageWithDisplayOnly = unescapedInput
       .replace(/@\[(.*?)\]\((.*?)\)/g, (_match, display, _id) => `@${display}`)
       .trim();
-    console.log("Message without mentions:", messageWithDisplayOnly);
 
     // Remove file after sending
     if (uploadedFile) {
@@ -606,15 +628,17 @@ export default function ChatPage() {
   };
 
   const handleNewChatSession = () => {
-    setSessionId(welcomeSession.id);
-    setMessages([welcomeMessage]);
-
     const isAlreadyPresent = chatSessions.some(
       (session) => session.id === welcomeSession.id
     );
 
     if (!isAlreadyPresent) {
-      setChatSessions([welcomeSession, ...chatSessions]);
+      setChatSessions((prev) => [welcomeSession, ...prev]);
+      setSessionId(welcomeSession.id);
+      welcomeMessage.timestamp = new Date();
+      setMessages([welcomeMessage]);
+      if (!isChatSessionsCollapsed)
+        setIsChatSessionsCollapsed(!isChatSessionsCollapsed);
     }
 
     if (newChatSessionBtnRef.current) {
@@ -721,7 +745,6 @@ export default function ChatPage() {
     } finally {
       setEditingSessionId(null);
       setEditedName("");
-      window.location.reload();
     }
   };
 
@@ -789,7 +812,7 @@ export default function ChatPage() {
                 {chatSessions.map((session, index) => (
                   <div
                     key={index}
-                    className="group flex items-center justify-between p-2 rounded-md hover:bg-muted/ 50 cursor-pointer"
+                    className="group flex items-center justify-between px-2 py-1 rounded-md hover:bg-muted/50 cursor-pointer"
                     onClick={() => handleCurrentChatSession(session.id)}
                   >
                     <div className="flex-1 min-w-0">
@@ -816,7 +839,7 @@ export default function ChatPage() {
                             }
                           }}
                           autoFocus
-                          className="text-sm font-medium bg-transparent border-b border-muted outline-none"
+                          className="text-sm font-medium bg-transparent border-b border-black outline-none"
                         />
                       ) : (
                         <p className="text-sm font-medium truncate cursor-pointer">
@@ -831,7 +854,7 @@ export default function ChatPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         asChild
-                        className={`${session.id == "1" && "hidden"}`}
+                        className={`${session.id == "1" && ""}`}
                       >
                         <Button
                           variant="ghost"
@@ -1040,10 +1063,10 @@ export default function ChatPage() {
                       </div>
                     </div>
                   )}
-                  <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
-                    <ReactMarkdown remarkPlugins={[remarkBreaks]}>
-                      {message.content}
-                    </ReactMarkdown>
+                  <div>
+                    <div className="whitespace-pre-wrap">
+                      <p>{message.content}</p>
+                    </div>
                   </div>
                   <p
                     suppressHydrationWarning
