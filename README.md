@@ -199,35 +199,5 @@ privgpt-studio/
 └── README.md
 ```
 
-<h3 align="right"><a href="#top">⬆️</a></h3>
-
-## 🌟 Project Admin and Mentors
-
-<table>
-<tr>
-<td align="center">
-<a href="https://github.com/rucha-ambaliya"><img src="https://github.com/rucha-ambaliya.png" height="140px" width="140px" alt="Rucha Ambaliya"></a><br><sub><b>Project Admin - Rucha Ambaliya</b></sub>
-</tr>
-</table>
-
-<h3 align="right"><a href="#top">⬆️</a></h3>
-
-## 🙌 Project Contributors
-
-<a href="https://github.com/rucha-ambaliya/privgpt-studio/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=rucha-ambaliya/privgpt-studio&cache_burst=1" />
-</a>
-
-<h3 align="right"><a href="#top">⬆️</a></h3>
-
-## 📜 License
-This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Make sure to review and comply with the license terms.
-
-✔️ You may use, modify, and share the code only for **non‑commercial purposes**.  
-✔️ You must include the following attribution in any copies or derivative works:  
-`Required Notice: Copyright 2025 Rucha Ambaliya (https://github.com/rucha-ambaliya/privgpt-studio)`  
-🚫 Commercial use requires **separate permission** from the author.
-
-See the [LICENSE](https://github.com/rucha-ambaliya/privgpt-studio/blob/master/LICENSE) file for more details.
-
-<h3 align="right"><a href="#top">⬆️</a></h3>
+---
+© 2025 Rucha Ambaliya. All rights reserved.
