@@ -32,7 +32,7 @@
 - [📦 Features](#-features)
 - [🛠 Tech Stack](#-tech-stack)
 - [🖥️ Getting Started](#️-getting-started)
-- [🤝 Contributing](#️-contributing)
+- [🤝 Contributing](#-contributing)
 - [💬 Support](#-support)
 - [📂 Project Structure](#-project-structure)
 - [🌟 Project Admin and Mentors](#-project-admin-and-mentors)
