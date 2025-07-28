@@ -7,8 +7,6 @@ labels: bug
 
 <!-- Thank you for taking the time to contribute! 🙌 -->
 
-<!-- **Suggested Title Format:** `BUG: Short description of the suggestion` -->
-
 
 # Describe the bug
 <!-- A clear and concise description of what the bug is. -->

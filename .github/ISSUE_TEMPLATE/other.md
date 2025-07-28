@@ -7,8 +7,6 @@ labels: enhancement
 
 <!-- Thank you for taking the time to contribute! 🙌 -->
 
-<!-- **Suggested Title Format:** `OTHER: Short description of the suggestion` -->
-
 
 # Description
 <!-- What would you like to ask or suggest? Be as clear as possible. -->

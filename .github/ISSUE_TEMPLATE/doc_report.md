@@ -7,7 +7,6 @@ labels: documentation
 
 <!-- Thank you for taking the time to contribute! 🙌 -->
 
-<!-- **Suggested Title Format:** `DOC: Short description of the suggestion` -->
 
 # Description
 <!-- Clearly describe the documentation update or issue. -->

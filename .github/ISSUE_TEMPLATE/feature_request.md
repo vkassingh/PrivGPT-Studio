@@ -7,7 +7,6 @@ labels: enhancement
 
 <!-- Thank you for taking the time to contribute! 🙌 -->
 
-<!-- **Suggested Title Format:** `FEATURE: Short description of the suggestion` -->
 
 # Purpose of Feature
 <!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
