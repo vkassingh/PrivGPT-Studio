@@ -11,27 +11,37 @@ from bson import ObjectId
 from datetime import datetime, timedelta
 import fitz
 
-load_dotenv() 
+#Load environment variables from .env file
+load_dotenv()
 
+#Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-# Configure Gemini API
+# Configure Gemini API using environment variable
 GEMINI_API_KEY=os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
-# Connect MongoDB
+# Connect MongoDB using environment variable
 MONGODB_URL = os.getenv("MONGODB_URL")
 app.config["MONGO_URI"] = MONGODB_URL
 mongo = PyMongo(app)
 
+# Reference to the MongoDB collection used to store chat sessions
 sessions_collection = mongo.db.sessions
 
 # Test mongodb connection
 @app.route("/mongo-test")
 def mongo_test():
+    """
+    Tests MongoDB connection by counting documents in the sessions collection.
+
+    Returns:
+    str: Success message with document count or error message.
+    """
+
     try:
         count = mongo.db.sessions.count_documents({})
         return f"Connected to MongoDB! Session count: {count}"
@@ -39,6 +49,12 @@ def mongo_test():
         return f"MongoDB connection failed: {str(e)}", 500
 
 def get_available_models():
+    """
+    Fetches list of available local models from Ollama.
+
+    Returns:
+    list: Names of available local models.
+    """
     try:
         res = requests.get("http://localhost:11434/api/tags", timeout=5)
         return sorted(set(m['name'].split(":")[0] for m in res.json().get("models", [])))
@@ -47,6 +63,13 @@ def get_available_models():
 
 @app.route("/models")
 def models():
+    """
+    Returns available local and cloud models.
+
+    Returns:
+    JSON: Dictionary with local_models and cloud_models keys.
+    """
+
     local_models=get_available_models()
     cloud_models=["gemini"]
     return jsonify({
@@ -56,12 +79,27 @@ def models():
 
 @app.route("/select_model", methods=["POST"])
 def select_model():
+    """
+    Selects the current model based on user input.
+
+    Returns:
+    JSON: Status of model selection.
+    """
+
     global current_model
     current_model = request.json.get("model", "phi3")
     return jsonify({"status": "ok"})
 
 @app.route("/chat", methods=["POST"])
 def chat():
+    """
+    Handles user chat requests, processes messages, optional file input,
+    interacts with local or cloud models, and stores conversation in MongoDB.
+
+    Returns:
+    JSON: Bot response, session ID, timestamp, and latency.
+    """
+
     try:
         # ====== Base form data ======
         user_msg = request.form.get("message", "")
@@ -82,6 +120,7 @@ def chat():
                     if s:
                         for m in s.get("messages", []):
                             history_context += f"{m['role']}: {m['content']}\n"
+        # Handle uploaded file
         if history_context:
             combined_input = (
                 f"Here is some previous conversation context that you should consider:\n"
@@ -155,7 +194,7 @@ def chat():
             {"role": "bot", "content": bot_reply, "timestamp": datetime.now(), "model_name": model_name}
         ]
 
-        # ====== Store in DB ======
+        # save chat history to DB
         if session_id != "1":
             mongo.db.sessions.update_one(
                 {"_id": ObjectId(session_id)},
@@ -183,7 +222,12 @@ def chat():
 
 
 def save_and_return(session_id, session_name, model_name, user_msg, bot_reply, uploaded_file, file_bytes):
-    """Helper for media case to store and return."""
+    """
+    Saves conversation with file info and returns response JSON.
+
+    Returns:
+    JSON: Chat response and metadata.
+    """
     messages = [
         {
             "role": "user",
@@ -202,6 +246,8 @@ def save_and_return(session_id, session_name, model_name, user_msg, bot_reply, u
             "model_name": model_name,
         }
     ]
+
+
     if session_id != "1":
         mongo.db.sessions.update_one(
             {"_id": ObjectId(session_id)},
@@ -228,6 +274,12 @@ def save_and_return(session_id, session_name, model_name, user_msg, bot_reply, u
 
 @app.route("/chat/history", methods=["POST"])
 def chat_history():
+    """
+    Fetches chat history for given session IDs.
+
+    Returns:
+    JSON: List of sessions with message history.
+    """
     data = request.json or {}
     id_list = data.get("session_ids", [])
     
@@ -249,6 +301,15 @@ def chat_history():
 
 @app.route("/chat/<session_id>", methods=["GET"])
 def get_session_messages(session_id):
+    """
+    Retrieves all messages for a specific chat session.
+
+    Args:
+    session_id (str): MongoDB ObjectId of the session.
+
+    Returns:
+    JSON: Session ID and message list or error.
+    """
     try:
         session = mongo.db.sessions.find_one({"_id": ObjectId(session_id)})
 
@@ -270,6 +331,13 @@ def get_session_messages(session_id):
 
 @app.route("/chat/rename", methods=["POST"])
 def rename_session():
+    """
+    Renames a chat session.
+
+    Returns:
+    JSON: Status message indicating success or failure.
+    """
+
     data = request.json or {}
     session_id = data.get("session_id")
     new_name = data.get("new_name")
@@ -293,6 +361,12 @@ def rename_session():
     
 @app.route("/clear", methods=["POST"])
 def clear():
+    """
+    Clears all messages from a chat session.
+
+    Returns:
+    JSON: Status and session ID.
+    """
     data = request.get_json()
     session_id = data.get("session_id")
 
@@ -320,9 +394,28 @@ for m in genai.list_models():
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'mp4', 'pdf', 'mp3'}
 
 def allowed_file(filename):
+    """
+    Checks if uploaded file has an allowed extension.
+
+    Args:
+    filename (str): Name of the uploaded file.
+
+    Returns:
+    bool: True if file extension is allowed, else False.
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def extract_text_from_pdf_bytes(file_bytes: bytes) -> str:
+    """
+    Extracts text content from PDF file bytes.
+
+    Args:
+    file_bytes (bytes): PDF file content.
+
+    Returns:
+    str: Extracted plain text from PDF.
+    """
+
     text = ""
     with fitz.open(stream=file_bytes, filetype="pdf") as doc:
         for page in doc:
@@ -332,6 +425,15 @@ def extract_text_from_pdf_bytes(file_bytes: bytes) -> str:
 
 @app.route("/chat/delete/<session_id>", methods=["DELETE"])
 def delete_chat(session_id):
+    """
+    Deletes an entire chat session.
+
+    Args:
+    session_id (str): MongoDB ObjectId of the session.
+
+    Returns:
+    JSON: Status message indicating success or failure.
+    """
     try:
         # Validate session_id
         if not ObjectId.is_valid(session_id):
