@@ -1,3 +1,5 @@
+<!-- Thank you for taking the time to contribute! 🙌 -->
+
 # Fixes Issue
 <!-- Example: Closes #32 -->
 Fixes #
