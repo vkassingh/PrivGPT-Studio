@@ -11,16 +11,16 @@ from bson import ObjectId
 from datetime import datetime, timedelta
 import fitz
 
-#Load environment variables from .env file
+# Load environment variables from .env file
 load_dotenv()
 
-#Initialize Flask app
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Configure Gemini API using environment variable
-GEMINI_API_KEY=os.getenv("GEMINI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
 
@@ -31,6 +31,7 @@ mongo = PyMongo(app)
 
 # Reference to the MongoDB collection used to store chat sessions
 sessions_collection = mongo.db.sessions
+
 
 # Test mongodb connection
 @app.route("/mongo-test")
@@ -48,6 +49,7 @@ def mongo_test():
     except Exception as e:
         return f"MongoDB connection failed: {str(e)}", 500
 
+
 def get_available_models():
     """
     Fetches list of available local models from Ollama.
@@ -61,6 +63,7 @@ def get_available_models():
     except:
         return []
 
+
 @app.route("/models")
 def models():
     """
@@ -70,12 +73,13 @@ def models():
     JSON: Dictionary with local_models and cloud_models keys.
     """
 
-    local_models=get_available_models()
-    cloud_models=["gemini"]
+    local_models = get_available_models()
+    cloud_models = ["gemini"]
     return jsonify({
         "local_models": local_models,
         "cloud_models": cloud_models,
     })
+
 
 @app.route("/select_model", methods=["POST"])
 def select_model():
@@ -89,6 +93,7 @@ def select_model():
     global current_model
     current_model = request.json.get("model", "phi3")
     return jsonify({"status": "ok"})
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -130,7 +135,7 @@ def chat():
             )
         else:
             combined_input = user_msg
-        
+
         # ====== File Handling (optional) ======
         uploaded_file = request.files.get("uploaded_file")
         if uploaded_file:
@@ -159,7 +164,8 @@ def chat():
                     latency_ms = 0
                     bot_reply = response.text or "No reply."
                     # Save to DB (with uploaded_file info)
-                    return save_and_return(session_id, session_name, model_name, user_msg, bot_reply, uploaded_file, file_bytes)
+                    return save_and_return(session_id, session_name, model_name, user_msg, bot_reply, uploaded_file,
+                                           file_bytes)
 
         # ====== Model Handling (text only or text+mentions) ======
         bot_reply = "No reply."
@@ -247,7 +253,6 @@ def save_and_return(session_id, session_name, model_name, user_msg, bot_reply, u
         }
     ]
 
-
     if session_id != "1":
         mongo.db.sessions.update_one(
             {"_id": ObjectId(session_id)},
@@ -272,6 +277,7 @@ def save_and_return(session_id, session_name, model_name, user_msg, bot_reply, u
         "latency": 0
     })
 
+
 @app.route("/chat/history", methods=["POST"])
 def chat_history():
     """
@@ -282,7 +288,7 @@ def chat_history():
     """
     data = request.json or {}
     id_list = data.get("session_ids", [])
-    
+
     try:
         object_ids = [ObjectId(sid) for sid in id_list]
     except Exception as e:
@@ -296,8 +302,9 @@ def chat_history():
         for msg in session.get("messages", []):
             msg["timestamp"] = msg["timestamp"].isoformat()
         result.append(session)
-    
+
     return jsonify(result)
+
 
 @app.route("/chat/<session_id>", methods=["GET"])
 def get_session_messages(session_id):
@@ -329,6 +336,7 @@ def get_session_messages(session_id):
     except Exception as e:
         return jsonify({"error": f"Invalid session ID: {str(e)}"}), 400
 
+
 @app.route("/chat/rename", methods=["POST"])
 def rename_session():
     """
@@ -341,7 +349,7 @@ def rename_session():
     data = request.json or {}
     session_id = data.get("session_id")
     new_name = data.get("new_name")
-    
+
     if not session_id or not new_name:
         return jsonify({"error": "Missing session_id or new_name"}), 400
 
@@ -358,7 +366,8 @@ def rename_session():
 
     except Exception as e:
         return jsonify({"error": f"Failed to rename session: {str(e)}"}), 500
-    
+
+
 @app.route("/clear", methods=["POST"])
 def clear():
     """
@@ -383,15 +392,17 @@ def clear():
             return jsonify({"error": "Session not found"}), 404
 
         return jsonify({"status": "cleared", "session_id": session_id})
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 for m in genai.list_models():
     print(m.name, m.supported_generation_methods)
 
 # Allowed image extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'mp4', 'pdf', 'mp3'}
+
 
 def allowed_file(filename):
     """
@@ -404,6 +415,7 @@ def allowed_file(filename):
     bool: True if file extension is allowed, else False.
     """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def extract_text_from_pdf_bytes(file_bytes: bytes) -> str:
     """
@@ -422,6 +434,7 @@ def extract_text_from_pdf_bytes(file_bytes: bytes) -> str:
             text += page.get_text()
             text += "\n\n"
     return text.strip()
+
 
 @app.route("/chat/delete/<session_id>", methods=["DELETE"])
 def delete_chat(session_id):
@@ -449,6 +462,7 @@ def delete_chat(session_id):
     except Exception as e:
         print("Error in /chat/delete:", e)
         return jsonify({"error": str(e)}), 500
-    
+
+
 if __name__ == "__main__":
     app.run(debug=True)
