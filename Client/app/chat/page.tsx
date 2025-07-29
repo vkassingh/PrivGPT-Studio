@@ -1380,7 +1380,7 @@ export default function ChatPage() {
                 variant="destructive"
                 className="bg-red-500 hover:bg-red-600"
               >
-                <Square className="w-4 h-4" />
+                Stop
               </Button>
             ) : (
               <Button
