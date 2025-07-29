@@ -89,6 +89,25 @@ interface UploadedFile {
 }
 
 export default function ChatPage() {
+  // Loading dots animation component
+  const LoadingDots = () => {
+    const [dots, setDots] = useState('.');
+    
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setDots(prev => {
+          if (prev === '.') return '..';
+          if (prev === '..') return '...';
+          return '.';
+        });
+      }, 500);
+      
+      return () => clearInterval(interval);
+    }, []);
+    
+    return <span>{dots}</span>;
+  };
+
   const welcomeMessage: Message = {
     id: "1",
     content: "Hello! I'm your AI assistant. How can I help you today?",
@@ -463,7 +482,12 @@ export default function ChatPage() {
                     break;
                     
                   case 'chunk':
-                    streamedContent += data.text;
+                    // If this is the first chunk and we still have "..." as content, clear it first
+                    if (streamedContent === "" && data.text) {
+                      streamedContent = data.text;
+                    } else {
+                      streamedContent += data.text;
+                    }
                     // Update the temporary message with streamed content
                     setMessages((prev) => 
                       prev.map((msg) => 
@@ -1225,7 +1249,7 @@ export default function ChatPage() {
                   )}
                   <div>
                     <div className="whitespace-pre-wrap">
-                      <p>{message.content}</p>
+                      <p>{message.content === '...' ? <LoadingDots /> : message.content}</p>
                     </div>
                   </div>
                   <p

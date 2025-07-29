@@ -249,9 +249,6 @@ def chat_stream():
             # Send session info first
             yield f"data: {json.dumps({'type': 'session_info', 'session_id': session_id})}\n\n"
             
-            # Send initial empty chunk to replace the "..." placeholder
-            yield f"data: {json.dumps({'type': 'chunk', 'text': ''})}\n\n"
-            
             try:
                 if model_type == "local":
                     payload = {
