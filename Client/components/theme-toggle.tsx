@@ -1,17 +1,22 @@
-"use client"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+'use client';
 
-import { Button } from "@/components/ui/button"
+import { useTheme } from './theme-provider';
+import { RiMoonClearFill, RiSunFill } from 'react-icons/ri';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { darkMode, toggleTheme } = useTheme();
 
   return (
-    <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
-  )
+    <button
+      onClick={toggleTheme}
+      className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 transition-colors"
+      aria-label="Toggle theme"
+    >
+      {darkMode ? (
+        <RiSunFill className="w-5 h-5 text-yellow-400" />
+      ) : (
+        <RiMoonClearFill className="w-5 h-5 text-gray-800 dark:text-gray-100" />
+      )}
+    </button>
+  );
 }
