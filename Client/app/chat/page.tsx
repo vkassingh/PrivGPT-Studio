@@ -66,6 +66,7 @@ import {
 import { MentionsInput, Mention } from "react-mentions";
 import SplashScreen from "../splashScreen";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 interface Message {
   id: string;
@@ -151,6 +152,7 @@ export default function ChatPage() {
   const [showSplash, setShowSplash] = useState(true);
   const [isStreaming, setIsStreaming] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [streamingEnabled, setStreamingEnabled] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 4000);
@@ -355,13 +357,13 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
-    // Use streaming endpoint for text-only messages, regular endpoint for file uploads
-    const endpoint = uploadedFile 
+    // Use streaming endpoint for text-only messages (if streaming is enabled), regular endpoint for file uploads or when streaming is disabled
+    const endpoint = uploadedFile || !streamingEnabled
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`
       : `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/stream`;
     
-    // Only set typing indicator for file uploads (non-streaming cases)
-    if (uploadedFile) {
+    // Only set typing indicator for file uploads (non-streaming cases) or when streaming is disabled
+    if (uploadedFile || !streamingEnabled) {
       setIsTyping(true);
     }
 
@@ -383,7 +385,7 @@ export default function ChatPage() {
     }
 
     // Handle file uploads with regular endpoint
-    if (uploadedFile) {
+    if (uploadedFile || !streamingEnabled) {
       try {
         const response = await fetch(endpoint, {
           method: "POST",
@@ -1096,7 +1098,16 @@ export default function ChatPage() {
 
         {/* Model Selection */}
         <div className="p-4 border-b">
-          <h3 className="font-semibold mb-3">AI Model</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">AI Model</h3>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-muted-foreground">Stream</span>
+              <Switch
+                checked={streamingEnabled}
+                onCheckedChange={setStreamingEnabled}
+              />
+            </div>
+          </div>
           <Select
             value={selectedModel}
             onValueChange={(model: string) => {
