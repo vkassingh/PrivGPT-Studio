@@ -143,6 +143,7 @@ export default function ChatPage() {
       abortController.abort();
       setAbortController(null);
       setIsStreaming(false);
+      // Reset typing indicator if it was set
       setIsTyping(false);
     }
   };
@@ -334,12 +335,16 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsTyping(true);
 
     // Use streaming endpoint for text-only messages, regular endpoint for file uploads
     const endpoint = uploadedFile 
       ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`
       : `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/stream`;
+    
+    // Only set typing indicator for file uploads (non-streaming cases)
+    if (uploadedFile) {
+      setIsTyping(true);
+    }
 
     const formData = new FormData();
     formData.append("message", userMessage.content);
@@ -408,7 +413,7 @@ export default function ChatPage() {
     // Handle streaming for text-only messages
     const tempAssistantMessage: Message = {
       id: (Date.now() + 1).toString(),
-      content: "",
+      content: "...",
       role: "assistant",
       timestamp: new Date(),
     };
@@ -517,7 +522,6 @@ export default function ChatPage() {
         newChatSessionBtnRef.current.disabled = false;
       }
 
-      setIsTyping(false);
       setIsStreaming(false);
       setAbortController(null);
       setLatency(latencyValue);
@@ -546,7 +550,6 @@ export default function ChatPage() {
         );
       }
       
-      setIsTyping(false);
       setIsStreaming(false);
       setAbortController(null);
     }
