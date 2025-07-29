@@ -71,7 +71,7 @@ Before you begin, make sure you have the following installed:
    cd PrivGPT-Studio
    ```
 
-4. Set up the project (if not done already) by following instructions in [Getting Started](../README.md#️-getting-started)
+4. Set up the project (if not done already) by following instructions in [Getting Started](../README.md#3-set-up-the-client-nextjs-frontend)
 
 5. 🔗 Set upstream to the main repo:
     ```
@@ -101,6 +101,9 @@ Before you begin, make sure you have the following installed:
     ```
 
 10. 🔄 Open a Pull Request on GitHub.
+
+    **Important:** Always open your Pull Request **to the `review` branch**, **not `main`**.  
+    🚫 Pull requests directly to `main` will not be merged.
 
     **Before creating a Pull Request** Make sure your branch is up to date with the latest changes from the upstream main branch:
 

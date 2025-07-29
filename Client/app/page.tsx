@@ -408,7 +408,7 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-foreground">
+                  <Link href="/privacy-policy" className="hover:text-foreground">
                     Privacy Policy
                   </Link>
                 </li>

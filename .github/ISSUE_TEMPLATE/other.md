@@ -1,0 +1,23 @@
+---
+name: 💭 Other issue
+about: For general questions, suggestions, or anything not covered above
+title: "OTHER: <brief description>"
+labels: enhancement
+---
+
+<!-- Thank you for taking the time to contribute! 🙌 -->
+
+
+# Description
+<!-- What would you like to ask or suggest? Be as clear as possible. -->
+
+
+# Related Context (if any)
+<!-- Link related issues or PRs, or explain background details. -->
+
+# Checklist
+<!-- Please delete the options that are not relevant to you. -->
+- [ ] I am a GSSoC'25 contributor
+
+# Screenshots (if applicable)
+<!-- Share screenshots or design suggestions, if helpful. -->
