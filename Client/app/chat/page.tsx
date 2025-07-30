@@ -48,6 +48,7 @@ import {
   File,
   ImageIcon,
   PlusCircle,
+  Square,
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -65,6 +66,7 @@ import {
 import { MentionsInput, Mention } from "react-mentions";
 import SplashScreen from "../splashScreen";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 interface Message {
   id: string;
@@ -88,6 +90,25 @@ interface UploadedFile {
 }
 
 export default function ChatPage() {
+  // Loading dots animation component
+  const LoadingDots = () => {
+    const [dots, setDots] = useState('.');
+    
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setDots(prev => {
+          if (prev === '.') return '..';
+          if (prev === '..') return '...';
+          return '.';
+        });
+      }, 500);
+      
+      return () => clearInterval(interval);
+    }, []);
+    
+    return <span>{dots}</span>;
+  };
+
   const welcomeMessage: Message = {
     id: "1",
     content: "Hello! I'm your AI assistant. How can I help you today?",
@@ -129,11 +150,24 @@ export default function ChatPage() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [deleteChatSessionModal, setDeleteChatSessionModal] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [streamingEnabled, setStreamingEnabled] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 4000);
     return () => clearTimeout(timer);
   }, []);
+
+  const stopGeneration = () => {
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+      setIsStreaming(false);
+      // Reset typing indicator if it was set
+      setIsTyping(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -312,11 +346,6 @@ export default function ChatPage() {
       .replace(/@\[(.*?)\]\((.*?)\)/g, (_match, display, _id) => `@${display}`)
       .trim();
 
-    // Remove file after sending
-    if (uploadedFile) {
-      removeFile();
-    }
-
     const userMessage: Message = {
       id: Date.now().toString(),
       content: messageWithDisplayOnly,
@@ -327,9 +356,16 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsTyping(true);
 
-    const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`;
+    // Use streaming endpoint for text-only messages (if streaming is enabled), regular endpoint for file uploads or when streaming is disabled
+    const endpoint = uploadedFile || !streamingEnabled
+      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`
+      : `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/stream`;
+    
+    // Only set typing indicator for file uploads (non-streaming cases) or when streaming is disabled
+    if (uploadedFile || !streamingEnabled) {
+      setIsTyping(true);
+    }
 
     const formData = new FormData();
     formData.append("message", userMessage.content);
@@ -344,9 +380,12 @@ export default function ChatPage() {
     // append file if uploaded
     if (uploadedFile) {
       formData.append("uploaded_file", uploadedFile.file);
+      // Remove file after adding to form data
+      removeFile();
     }
 
-    setTimeout(async () => {
+    // Handle file uploads with regular endpoint
+    if (uploadedFile || !streamingEnabled) {
       try {
         const response = await fetch(endpoint, {
           method: "POST",
@@ -372,16 +411,13 @@ export default function ChatPage() {
         }
 
         const assistantMessage: Message = {
-          id: Date.now().toString(),
+          id: (Date.now() + 1).toString(),
           content: bot_response,
           role: "assistant",
           timestamp: new Date(data.timestamp),
         };
 
-        if (
-          newChatSessionBtnRef.current &&
-          newChatSessionBtnRef.current.disabled
-        ) {
+        if (newChatSessionBtnRef.current && newChatSessionBtnRef.current.disabled) {
           newChatSessionBtnRef.current.disabled = false;
         }
 
@@ -392,7 +428,157 @@ export default function ChatPage() {
         console.error("Failed to receive response from AI", error);
         setIsTyping(false);
       }
-    }, 10000);
+      return;
+    }
+
+    // Handle streaming for text-only messages
+    const tempAssistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: "...",
+      role: "assistant",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, tempAssistantMessage]);
+    setIsStreaming(true);
+
+    // Create abort controller for stopping generation
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch AI response");
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let streamedContent = "";
+      let finalSessionId = sessionId;
+      let latencyValue = "0";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                switch (data.type) {
+                  case 'session_info':
+                    if (data.session_id && data.session_id !== sessionId) {
+                      finalSessionId = data.session_id;
+                    }
+                    break;
+                    
+                  case 'chunk':
+                    // If this is the first chunk and we still have "..." as content, clear it first
+                    if (streamedContent === "" && data.text) {
+                      streamedContent = data.text;
+                    } else {
+                      streamedContent += data.text;
+                    }
+                    // Update the temporary message with streamed content
+                    setMessages((prev) => 
+                      prev.map((msg) => 
+                        msg.id === tempAssistantMessage.id 
+                          ? { ...msg, content: streamedContent }
+                          : msg
+                      )
+                    );
+                    break;
+                    
+                  case 'complete':
+                    if (data.session_id && sessionId === "1") {
+                      setSessionId(data.session_id);
+                      localStorage.setItem(
+                        "chat_sessions",
+                        JSON.stringify([
+                          ...JSON.parse(localStorage.getItem("chat_sessions") || "[]"),
+                          data.session_id,
+                        ])
+                      );
+                    }
+                    
+                    // Update final message with timestamp
+                    setMessages((prev) => 
+                      prev.map((msg) => 
+                        msg.id === tempAssistantMessage.id 
+                          ? { ...msg, content: streamedContent, timestamp: new Date(data.timestamp) }
+                          : msg
+                      )
+                    );
+                    
+                    latencyValue = data.latency?.toString() || "0";
+                    break;
+                    
+                  case 'error':
+                    streamedContent = data.message;
+                    setMessages((prev) => 
+                      prev.map((msg) => 
+                        msg.id === tempAssistantMessage.id 
+                          ? { ...msg, content: streamedContent }
+                          : msg
+                      )
+                    );
+                    break;
+                }
+              } catch (e) {
+                // Ignore JSON parse errors for malformed lines
+                console.warn("Failed to parse SSE data:", e);
+              }
+            }
+          }
+        }
+      }
+
+      if (newChatSessionBtnRef.current && newChatSessionBtnRef.current.disabled) {
+        newChatSessionBtnRef.current.disabled = false;
+      }
+
+      setIsStreaming(false);
+      setAbortController(null);
+      setLatency(latencyValue);
+
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('Generation was stopped by user');
+        // Update the temp message to show it was stopped
+        setMessages((prev) => 
+          prev.map((msg) => 
+            msg.id === tempAssistantMessage.id 
+              ? { ...msg, content: (msg.content || '') + '\n\n[Generation stopped by user]' }
+              : msg
+          )
+        );
+      } else {
+        console.error("Failed to receive response from AI", error);
+        
+        // Update the temp message with error
+        setMessages((prev) => 
+          prev.map((msg) => 
+            msg.id === tempAssistantMessage.id 
+              ? { ...msg, content: "Failed to get response from AI. Please try again." }
+              : msg
+          )
+        );
+      }
+      
+      setIsStreaming(false);
+      setAbortController(null);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -912,7 +1098,16 @@ export default function ChatPage() {
 
         {/* Model Selection */}
         <div className="p-4 border-b">
-          <h3 className="font-semibold mb-3">AI Model</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">AI Model</h3>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-muted-foreground">Stream</span>
+              <Switch
+                checked={streamingEnabled}
+                onCheckedChange={setStreamingEnabled}
+              />
+            </div>
+          </div>
           <Select
             value={selectedModel}
             onValueChange={(model: string) => {
@@ -1065,7 +1260,7 @@ export default function ChatPage() {
                   )}
                   <div>
                     <div className="whitespace-pre-wrap">
-                      <p>{message.content}</p>
+                      <p>{message.content === '...' ? <LoadingDots /> : message.content}</p>
                     </div>
                   </div>
                   <p
@@ -1087,13 +1282,13 @@ export default function ChatPage() {
                 </Avatar>
                 <div className="bg-muted rounded-lg px-4 py-2">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                    <div className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce"></div>
                     <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                      className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce"
                       style={{ animationDelay: "0.1s" }}
                     ></div>
                     <div
-                      className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                      className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce"
                       style={{ animationDelay: "0.2s" }}
                     ></div>
                   </div>
@@ -1214,12 +1409,22 @@ export default function ChatPage() {
                 className="flex-1 resize-none min-h-[80px]"
               />
             )}
-            <Button
-              onClick={handleSend}
-              disabled={isTyping || (!uploadedFile && input.trim() === "")}
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+            {isStreaming ? (
+              <Button
+                onClick={stopGeneration}
+                variant="destructive"
+                className="bg-red-500 hover:bg-red-600"
+              >
+                Stop
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSend}
+                disabled={isTyping || (!uploadedFile && input.trim() === "")}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            )}
           </div>
 
           {/* Action Buttons */}
