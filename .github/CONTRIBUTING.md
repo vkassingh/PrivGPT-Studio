@@ -16,7 +16,7 @@
 - [🌟 How to Submit a Contribution / PR](#-how-to-submit-a-contribution--pr)
 - [📜 Code of Conduct](#-code-of-conduct)
 - [💬 Support](#-support)
-- [⚖️ License](#-license)
+- [⚖ License](#-license)
 
 ## ✨ Ways to Contribute
 - 🐛 **Report bugs** by opening an issue
