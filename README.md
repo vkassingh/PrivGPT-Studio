@@ -28,16 +28,16 @@
 
 - [🚀 Demo](#-demo)
 - [💡 Why It’s Needed](#-why-its-needed)
-- [✨ Overview](#-overview)
 - [📦 Features](#-features)
 - [🛠 Tech Stack](#-tech-stack)
 - [🖥️ Getting Started](#️-getting-started)
-- [🤝 Contributing](#-contributing)
-- [💬 Support](#-support)
 - [📂 Project Structure](#-project-structure)
+- [🤝 Contributing](#-contributing)
+- [📜 Code of Conduct](#-code-of-conduct)
+- [💬 Support](#-support)
 - [🌟 Project Admin and Mentors](#-project-admin-and-mentors)
 - [🙌 Project Contributors](#-project-contributors)
-- [📜 License](#-license)
+- [⚖️ License](#-license)
 <br>
 
 ## 🎥 Demo
@@ -60,27 +60,16 @@ AI tools are everywhere — but most send your data to cloud servers you can’t
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## ✨ Overview
-
-PrivGPT Studio is a **privacy‑first AI workspace** where you can:  
-✅ Run **local models** and **cloud models** side by side  
-✅ Keep each chat **independent**, but reference others when needed  
-✅ Upload **PDFs, images, videos, and audio** for analysis  
-✅ Use **voice input** with built‑in transcription  
-✅ **Rename, export, clear, delete** chats easily  
-✅ **Track latency** and switch models on the fly  
-✅ Even **work offline** by falling back to a local model automatically
-
-<h3 align="right"><a href="#top">⬆️</a></h3>
-
 ## 📦 Features
 
-- 🧠 Multi‑chat with cross‑references
-- 🔒 Privacy‑first design (local/cloud separation)
-- 📄 PDF summarization, 📊 image/graph interpretation, 🎤 voice input
-- ✨ Rename, export, delete sessions
-- ⚡ Offline fallback to local models
-- 📈 Latency count and metrics
+🧠 Multi‑chat with cross‑references<br>
+🔒 Privacy‑first design (local/cloud separation)<br>
+📄 PDF summarization<br>
+📊 image/graph interpretation<br>
+🎤 voice input<br>
+✨ Rename, export, delete sessions<br>
+⚡ Offline fallback to local models<br>
+📈 Latency count and metrics<br>
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
@@ -129,8 +118,18 @@ cd PrivGPT-Studio
 
 ```bash
 cd client
+
 npm ci
-copy .env.example .env # (For linux) cp .env.example .env
+# If you face a dependency conflict (ERESOLVE error), try:
+# npm install --legacy-peer-deps
+# If that doesn't work either, try:
+# npm install
+
+copy .env.example .env 
+# (For linux) cp .env.example .env
+# To learn how to obtain the variables required in '.env',
+# please see 'docs/env-setup-guide.md'.
+
 npm run dev
 # Runs on http://localhost:3000
 ```
@@ -141,10 +140,15 @@ npm run dev
 cd server
 
 python -m venv venv 
-venv\Scripts\activate # For (Linux/Mac) source venv/bin/activate
+venv\Scripts\activate 
+# For (Linux/Mac) source venv/bin/activate
 
 pip install -r requirements.txt
-copy .env.example .env # (For linux) cp .env.example .env
+
+copy .env.example .env 
+# (For linux) cp .env.example .env
+# To learn how to obtain the variables required in '.env',
+# please see 'docs/env-setup-guide.md'.
 
 python app.py
 # Runs on http://localhost:5000
@@ -159,6 +163,37 @@ ollama pull <model_name>
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
+## 📂 Project Structure
+
+```bash
+privgpt-studio/
+│
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   ├── CODE_OF_CONDUCT.md
+│   └── ...
+│
+├── assets/
+│
+├── client/          # Next.js frontend
+│   ├── app/
+│   ├── components/
+│   └── ...
+│
+├── docs/            
+│   └── env-setup-guide.md
+│   
+├── server/          # Flask backend
+│   ├── app.py
+│   ├── requirements.txt
+│   └── ...
+│
+├── LICENSE           
+└── README.md
+```
+
+<h3 align="right"><a href="#top">⬆️</a></h3>
+
 ## 🤝 Contributing
 
 Contributions are welcome! 🎉  
@@ -169,35 +204,22 @@ Please check our [Contributing Guidelines](.github/CONTRIBUTING.md) to learn abo
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## 💬 Support
+## 📜 Code of Conduct
+We are committed to creating a welcoming and inclusive environment for everyone. Please be respectful, inclusive, and considerate in all interactions.
 
-If you have questions, need help, or want to start a discussion about **PrivGPT Studio**,  
-please use [GitHub Discussions](https://github.com/rucha-ambaliya/privgpt-studio/discussions).  
-💡 We’d love to hear your ideas, feedback, and suggestions there!
+By participating in this project, you agree to follow our [Code of Conduct](./.github/CODE_OF_CONDUCT.md).
+
+If you witness or experience unacceptable behavior, please report it privately via [ruchaambaliya@gmail.com](mailto:ruchaambaliya@gmail.com).
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## 📂 Project Structure
+## 💬 Support
 
-```bash
-privgpt-studio/
-│
-├── client/          # Next.js frontend
-│   ├── components/
-│   ├── app/
-│   └── ...
-│
-├── server/          # Flask backend
-│   ├── app.py
-│   ├── requirements.txt
-│   └── ...
-│
-├── assets/
-│   ├── Demo_PrivGPT-Studio.mp4
-│   └── ...
-│
-└── README.md
-```
+If you have other questions, need help, or want to start a discussion about **PrivGPT Studio**,  
+please join our [Discord Server](https://discord.gg/J9z5T52rkZ).  
+💡 We’d love to hear your ideas, feedback, and suggestions there!
+
+<h3 align="right"><a href="#top">⬆️</a></h3>
 
 ## 🌟 Project Admin and Mentors
 
@@ -218,7 +240,7 @@ privgpt-studio/
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## 📜 License
+## ⚖️ License
 This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Make sure to review and comply with the license terms.
 
 ✔️ You may use, modify, and share the code only for **non‑commercial purposes**.  

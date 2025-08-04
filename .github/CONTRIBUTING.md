@@ -14,8 +14,9 @@
 - [🔍 How to Find Suitable Issues](#-how-to-find-suitable-issues)
 - [📝 Issue Guidelines](#-issue-guidelines)
 - [🌟 How to Submit a Contribution / PR](#-how-to-submit-a-contribution--pr)
+- [📜 Code of Conduct](#-code-of-conduct)
 - [💬 Support](#-support)
-- [📜 License](#-license)
+- [⚖️ License](#-license)
 
 ## ✨ Ways to Contribute
 - 🐛 **Report bugs** by opening an issue
@@ -102,9 +103,6 @@ Before you begin, make sure you have the following installed:
 
 10. 🔄 Open a Pull Request on GitHub.
 
-    **Important:** Always open your Pull Request **to the `review` branch**, **not `main`**.  
-    🚫 Pull requests directly to `main` will not be merged.
-
     **Before creating a Pull Request** Make sure your branch is up to date with the latest changes from the upstream main branch:
 
     ```
@@ -121,12 +119,21 @@ Before you begin, make sure you have the following installed:
 ## 💬 Support
 
 If you have other questions, need help, or want to start a discussion about **PrivGPT Studio**,  
-please use [GitHub Discussions](https://github.com/rucha-ambaliya/privgpt-studio/discussions).  
+please join our [Discord Server](https://discord.gg/J9z5T52rkZ).  
 💡 We’d love to hear your ideas, feedback, and suggestions there!
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## 📜 License
+## 📜 Code of Conduct
+We are committed to creating a welcoming and inclusive environment for everyone. Please be respectful, inclusive, and considerate in all interactions.
+
+By participating in this project, you agree to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+If you witness or experience unacceptable behavior, please report it privately via [ruchaambaliya@gmail.com](mailto:ruchaambaliya@gmail.com).
+
+<h3 align="right"><a href="#top">⬆️</a></h3>
+
+## ⚖️ License
 This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Make sure to review and comply with the [license terms](https://github.com/rucha-ambaliya/privgpt-studio/blob/master/LICENSE).
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
