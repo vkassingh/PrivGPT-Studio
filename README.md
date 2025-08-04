@@ -37,7 +37,7 @@
 - [💬 Support](#-support)
 - [🌟 Project Admin and Mentors](#-project-admin-and-mentors)
 - [🙌 Project Contributors](#-project-contributors)
-- [⚖️ License](#-license)
+- [⚖ License](#-license)
 <br>
 
 ## 🎥 Demo
@@ -240,7 +240,7 @@ please join our [Discord Server](https://discord.gg/J9z5T52rkZ).
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## ⚖️ License
+## ⚖ License
 This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Make sure to review and comply with the license terms.
 
 ✔️ You may use, modify, and share the code only for **non‑commercial purposes**.  
