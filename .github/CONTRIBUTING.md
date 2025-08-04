@@ -133,7 +133,7 @@ If you witness or experience unacceptable behavior, please report it privately v
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
 
-## ⚖️ License
+## ⚖ License
 This project is licensed under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Make sure to review and comply with the [license terms](https://github.com/rucha-ambaliya/privgpt-studio/blob/master/LICENSE).
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
