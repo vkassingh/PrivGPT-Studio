@@ -67,6 +67,13 @@ import { MentionsInput, Mention } from "react-mentions";
 import SplashScreen from "../splashScreen";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 interface Message {
   id: string;
@@ -107,6 +114,169 @@ export default function ChatPage() {
     }, []);
     
     return <span>{dots}</span>;
+  };
+
+  // Add this component inside your ChatPage component, before the return statement
+  const MessageContent = ({ content, isLoading }: { content: string; isLoading?: boolean }) => {
+    if (isLoading || content === '...') {
+      return <LoadingDots />;
+    }
+
+    return (
+      <div className="markdown-content">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeKatex]}
+          components={{
+            // Code blocks with syntax highlighting
+            code({ node, inline, className, children, ...props }) {
+              const match = /language-(\w+)/.exec(className || '');
+              const language = match ? match[1] : '';
+              
+              // Better inline detection - check multiple conditions
+              const isInline = inline || 
+                               !className || 
+                               !String(children).includes('\n') ||
+                               (String(children).trim().split('\n').length === 1 && String(children).length < 100);
+              
+              // Debug log to see what's happening (remove after testing)
+              console.log('Code rendering:', { 
+                inline, 
+                isInline, 
+                className, 
+                content: String(children),
+                hasNewlines: String(children).includes('\n')
+              });
+              
+              return isInline ? (
+                // Inline code
+                <code 
+                  className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-red-600 dark:text-red-400" 
+                  {...props}
+                >
+                  {children}
+                </code>
+              ) : (
+                // Block code
+                <div className="relative my-4">
+                  <div className="flex items-center justify-between bg-gray-800 text-gray-200 px-4 py-2 text-sm font-mono rounded-t-md">
+                    <span>{language || 'code'}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
+                        toast.success("Code copied to clipboard!");
+                      }}
+                      className="text-gray-400 hover:text-white text-xs"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <SyntaxHighlighter
+                    style={oneDark}
+                    language={language}
+                    PreTag="div"
+                    className="!mt-0 !rounded-t-none"
+                    {...props}
+                  >
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                </div>
+              );
+            },
+            // Headers
+            h1: ({ children }) => (
+              <h1 className="text-2xl font-bold mt-6 mb-4 text-gray-900 dark:text-gray-100">
+                {children}
+              </h1>
+            ),
+            h2: ({ children }) => (
+              <h2 className="text-xl font-semibold mt-5 mb-3 text-gray-900 dark:text-gray-100">
+                {children}
+              </h2>
+            ),
+            h3: ({ children }) => (
+              <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">
+                {children}
+              </h3>
+            ),
+            // Lists
+            ul: ({ children }) => (
+              <ul className="list-disc list-inside my-3 space-y-1 ml-4">
+                {children}
+              </ul>
+            ),
+            ol: ({ children }) => (
+              <ol className="list-decimal list-inside my-3 space-y-1 ml-4">
+                {children}
+              </ol>
+            ),
+            li: ({ children }) => (
+              <li className="text-gray-800 dark:text-gray-200">{children}</li>
+            ),
+            // Paragraphs
+            p: ({ children }) => (
+              <p className="mb-3 text-gray-800 dark:text-gray-200 leading-relaxed">
+                {children}
+              </p>
+            ),
+            // Blockquotes
+            blockquote: ({ children }) => (
+              <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic text-gray-600 dark:text-gray-400">
+                {children}
+              </blockquote>
+            ),
+            // Links
+            a: ({ href, children }) => (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {children}
+              </a>
+            ),
+            // Tables
+            table: ({ children }) => (
+              <div className="overflow-x-auto my-4">
+                <table className="min-w-full border border-gray-300 dark:border-gray-600">
+                  {children}
+                </table>
+              </div>
+            ),
+            thead: ({ children }) => (
+              <thead className="bg-gray-100 dark:bg-gray-700">{children}</thead>
+            ),
+            th: ({ children }) => (
+              <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left font-semibold">
+                {children}
+              </th>
+            ),
+            td: ({ children }) => (
+              <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                {children}
+              </td>
+            ),
+            // Horizontal rule
+            hr: () => (
+              <hr className="my-6 border-gray-300 dark:border-gray-600" />
+            ),
+            // Strong/Bold
+            strong: ({ children }) => (
+              <strong className="font-bold text-gray-900 dark:text-gray-100">
+                {children}
+              </strong>
+            ),
+            // Emphasis/Italic
+            em: ({ children }) => (
+              <em className="italic text-gray-800 dark:text-gray-200">{children}</em>
+            ),
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+    );
   };
 
   const welcomeMessage: Message = {
@@ -1259,9 +1429,10 @@ export default function ChatPage() {
                     </div>
                   )}
                   <div>
-                    <div className="whitespace-pre-wrap">
-                      <p>{message.content === '...' ? <LoadingDots /> : message.content}</p>
-                    </div>
+                    <MessageContent 
+                      content={message.content} 
+                      isLoading={message.content === '...'} 
+                    />
                   </div>
                   <p
                     suppressHydrationWarning
