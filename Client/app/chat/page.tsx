@@ -117,7 +117,7 @@ export default function ChatPage() {
   };
 
   // Add this component inside your ChatPage component, before the return statement
-  const MessageContent = ({ content, isLoading }: { content: string; isLoading?: boolean }) => {
+  const MessageContent = ({ content, isLoading, isUser = false }: { content: string; isLoading?: boolean; isUser?: boolean }) => {
     if (isLoading || content === '...') {
       return <LoadingDots />;
     }
@@ -151,7 +151,11 @@ export default function ChatPage() {
               return isInline ? (
                 // Inline code
                 <code 
-                  className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-red-600 dark:text-red-400" 
+                  className={`px-1.5 py-0.5 rounded text-sm font-mono ${
+                    isUser 
+                      ? "bg-primary-foreground/10 text-primary-foreground" 
+                      : "bg-gray-100 dark:bg-gray-800 text-red-600 dark:text-red-400"
+                  }`}
                   {...props}
                 >
                   {children}
@@ -185,17 +189,17 @@ export default function ChatPage() {
             },
             // Headers
             h1: ({ children }) => (
-              <h1 className="text-2xl font-bold mt-6 mb-4 text-gray-900 dark:text-gray-100">
+              <h1 className={`text-2xl font-bold mt-6 mb-4 ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className="text-xl font-semibold mt-5 mb-3 text-gray-900 dark:text-gray-100">
+              <h2 className={`text-xl font-semibold mt-5 mb-3 ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
-              <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100">
+              <h3 className={`text-lg font-semibold mt-4 mb-2 ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
                 {children}
               </h3>
             ),
@@ -211,17 +215,17 @@ export default function ChatPage() {
               </ol>
             ),
             li: ({ children }) => (
-              <li className="text-gray-800 dark:text-gray-200">{children}</li>
+              <li className={isUser ? "text-primary-foreground" : "text-gray-800 dark:text-gray-200"}>{children}</li>
             ),
             // Paragraphs
             p: ({ children }) => (
-              <p className="mb-3 text-gray-800 dark:text-gray-200 leading-relaxed">
+              <p className={`mb-3 leading-relaxed ${isUser ? "text-primary-foreground" : "text-gray-800 dark:text-gray-200"}`}>
                 {children}
               </p>
             ),
             // Blockquotes
             blockquote: ({ children }) => (
-              <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic text-gray-600 dark:text-gray-400">
+              <blockquote className={`border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic ${isUser ? "text-primary-foreground/80" : "text-gray-600 dark:text-gray-400"}`}>
                 {children}
               </blockquote>
             ),
@@ -231,7 +235,7 @@ export default function ChatPage() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                className={isUser ? "text-primary-foreground underline hover:text-primary-foreground/80" : "text-blue-600 dark:text-blue-400 hover:underline"}
               >
                 {children}
               </a>
@@ -263,13 +267,13 @@ export default function ChatPage() {
             ),
             // Strong/Bold
             strong: ({ children }) => (
-              <strong className="font-bold text-gray-900 dark:text-gray-100">
+              <strong className={`font-bold ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
                 {children}
               </strong>
             ),
             // Emphasis/Italic
             em: ({ children }) => (
-              <em className="italic text-gray-800 dark:text-gray-200">{children}</em>
+              <em className={`italic ${isUser ? "text-primary-foreground" : "text-gray-800 dark:text-gray-200"}`}>{children}</em>
             ),
           }}
         >
@@ -1432,6 +1436,7 @@ export default function ChatPage() {
                     <MessageContent 
                       content={message.content} 
                       isLoading={message.content === '...'} 
+                      isUser={message.role === "user"}
                     />
                   </div>
                   <p
