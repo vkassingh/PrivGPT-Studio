@@ -413,7 +413,7 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-foreground">
+                  <Link href="/terms" className="hover:text-foreground">
                     Terms of Service
                   </Link>
                 </li>
