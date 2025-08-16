@@ -446,7 +446,7 @@ export default function PrivacyPolicyPage() {
           </div>
           <Separator className="my-6" />
           <p className="text-sm text-muted-foreground">
-            &copy; 2024 PrivGPT Studio. All rights reserved.
+            &copy; 2025 PrivGPT Studio. All rights reserved.
           </p>
         </div>
       </footer>
