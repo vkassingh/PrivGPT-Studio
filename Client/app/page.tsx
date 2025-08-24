@@ -10,6 +10,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import SplashScreen from "./splashScreen";
 import { useState, useEffect } from "react";
 import { Head } from "react-day-picker";
+import ScrollToTop from "@/components/ui/scroll-to-top";
+
+
+
+
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
@@ -408,7 +413,10 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy-policy" className="hover:text-foreground">
+                  <Link
+                    href="/privacy-policy"
+                    className="hover:text-foreground"
+                  >
                     Privacy Policy
                   </Link>
                 </li>
@@ -448,6 +456,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      <ScrollToTop />
     </div>
   );
 }
