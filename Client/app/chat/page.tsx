@@ -434,7 +434,7 @@ export default function ChatPage() {
           );
 
           // ✅ Always keep welcomeSession first in the list
-          setChatSessions([welcomeSession, ...transformedSessions]);
+          setChatSessions([...transformedSessions]);
 
           // ✅ Only reset to welcomeSession if you are currently on it
           if (sessionId === welcomeSession.id || !sessionId) {
@@ -479,9 +479,11 @@ export default function ChatPage() {
 
     fetchChatSessionHistory();
   }, [sessionId, editedName]);
-  if (newChatSessionBtnRef.current) {
+  useEffect(() => {
+    if (newChatSessionBtnRef.current && !showSplash) {
     newChatSessionBtnRef.current.disabled = true;
   }
+  },[showSplash]);
   useEffect(() => {
     if (chatSessions.some((session) => session.id === "1")) {
       // welcomeSession exists, disable new chat button
@@ -490,7 +492,7 @@ export default function ChatPage() {
       }
     } else {
       // no welcome session, allow new chat
-      if (newChatSessionBtnRef.current) {
+      if (newChatSessionBtnRef.current && sessionId != "1") {
         newChatSessionBtnRef.current.disabled = false;
       }
     }
@@ -957,7 +959,7 @@ export default function ChatPage() {
         setChatSessions((prev) =>
           prev.filter((chatSession) => chatSession.id !== "1")
         );
-        if (newChatSessionBtnRef.current) {
+        if (newChatSessionBtnRef.current && id != "1") {
           newChatSessionBtnRef.current.disabled = false;
         }
       }
