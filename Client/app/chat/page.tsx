@@ -68,13 +68,13 @@ import { MentionsInput, Mention } from "react-mentions";
 import SplashScreen from "../splashScreen";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 interface Message {
   id: string;
@@ -100,26 +100,34 @@ interface UploadedFile {
 export default function ChatPage() {
   // Loading dots animation component
   const LoadingDots = () => {
-    const [dots, setDots] = useState('.');
-    
+    const [dots, setDots] = useState(".");
+
     useEffect(() => {
       const interval = setInterval(() => {
-        setDots(prev => {
-          if (prev === '.') return '..';
-          if (prev === '..') return '...';
-          return '.';
+        setDots((prev) => {
+          if (prev === ".") return "..";
+          if (prev === "..") return "...";
+          return ".";
         });
       }, 500);
-      
+
       return () => clearInterval(interval);
     }, []);
-    
+
     return <span>{dots}</span>;
   };
 
   // Add this component inside your ChatPage component, before the return statement
-  const MessageContent = ({ content, isLoading, isUser = false }: { content: string; isLoading?: boolean; isUser?: boolean }) => {
-    if (isLoading || content === '...') {
+  const MessageContent = ({
+    content,
+    isLoading,
+    isUser = false,
+  }: {
+    content: string;
+    isLoading?: boolean;
+    isUser?: boolean;
+  }) => {
+    if (isLoading || content === "...") {
       return <LoadingDots />;
     }
 
@@ -131,30 +139,32 @@ export default function ChatPage() {
           components={{
             // Code blocks with syntax highlighting
             code({ node, inline, className, children, ...props }: any) {
-              const match = /language-(\w+)/.exec(className || '');
-              const language = match ? match[1] : '';
-              
+              const match = /language-(\w+)/.exec(className || "");
+              const language = match ? match[1] : "";
+
               // Better inline detection - check multiple conditions
-              const isInline = inline || 
-                               !className || 
-                               !String(children).includes('\n') ||
-                               (String(children).trim().split('\n').length === 1 && String(children).length < 100);
-              
+              const isInline =
+                inline ||
+                !className ||
+                !String(children).includes("\n") ||
+                (String(children).trim().split("\n").length === 1 &&
+                  String(children).length < 100);
+
               // Debug log to see what's happening (remove after testing)
-              console.log('Code rendering:', { 
-                inline, 
-                isInline, 
-                className, 
+              console.log("Code rendering:", {
+                inline,
+                isInline,
+                className,
                 content: String(children),
-                hasNewlines: String(children).includes('\n')
+                hasNewlines: String(children).includes("\n"),
               });
-              
+
               return isInline ? (
                 // Inline code
-                <code 
+                <code
                   className={`px-1.5 py-0.5 rounded text-sm font-mono ${
-                    isUser 
-                      ? "bg-primary-foreground/10 text-primary-foreground" 
+                    isUser
+                      ? "bg-primary-foreground/10 text-primary-foreground"
                       : "bg-gray-100 dark:bg-gray-800 text-red-600 dark:text-red-400"
                   }`}
                   {...props}
@@ -165,10 +175,12 @@ export default function ChatPage() {
                 // Block code
                 <div className="relative my-4">
                   <div className="flex items-center justify-between bg-gray-800 text-gray-200 px-4 py-2 text-sm font-mono rounded-t-md">
-                    <span>{language || 'code'}</span>
+                    <span>{language || "code"}</span>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
+                        navigator.clipboard.writeText(
+                          String(children).replace(/\n$/, "")
+                        );
                         toast.success("Code copied to clipboard!");
                       }}
                       className="text-gray-400 hover:text-white text-xs"
@@ -183,24 +195,42 @@ export default function ChatPage() {
                     className="!mt-0 !rounded-t-none"
                     {...props}
                   >
-                    {String(children).replace(/\n$/, '')}
+                    {String(children).replace(/\n$/, "")}
                   </SyntaxHighlighter>
                 </div>
               );
             },
             // Headers
             h1: ({ children }) => (
-              <h1 className={`text-2xl font-bold mt-6 mb-4 ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
+              <h1
+                className={`text-2xl font-bold mt-6 mb-4 ${
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+              >
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className={`text-xl font-semibold mt-5 mb-3 ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
+              <h2
+                className={`text-xl font-semibold mt-5 mb-3 ${
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+              >
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
-              <h3 className={`text-lg font-semibold mt-4 mb-2 ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
+              <h3
+                className={`text-lg font-semibold mt-4 mb-2 ${
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+              >
                 {children}
               </h3>
             ),
@@ -216,17 +246,37 @@ export default function ChatPage() {
               </ol>
             ),
             li: ({ children }) => (
-              <li className={isUser ? "text-primary-foreground" : "text-gray-800 dark:text-gray-200"}>{children}</li>
+              <li
+                className={
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-800 dark:text-gray-200"
+                }
+              >
+                {children}
+              </li>
             ),
             // Paragraphs
             p: ({ children }) => (
-              <p className={`mb-3 leading-relaxed ${isUser ? "text-primary-foreground" : "text-gray-800 dark:text-gray-200"}`}>
+              <p
+                className={`mb-3 leading-relaxed ${
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-800 dark:text-gray-200"
+                }`}
+              >
                 {children}
               </p>
             ),
             // Blockquotes
             blockquote: ({ children }) => (
-              <blockquote className={`border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic ${isUser ? "text-primary-foreground/80" : "text-gray-600 dark:text-gray-400"}`}>
+              <blockquote
+                className={`border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-4 italic ${
+                  isUser
+                    ? "text-primary-foreground/80"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              >
                 {children}
               </blockquote>
             ),
@@ -236,7 +286,11 @@ export default function ChatPage() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={isUser ? "text-primary-foreground underline hover:text-primary-foreground/80" : "text-blue-600 dark:text-blue-400 hover:underline"}
+                className={
+                  isUser
+                    ? "text-primary-foreground underline hover:text-primary-foreground/80"
+                    : "text-blue-600 dark:text-blue-400 hover:underline"
+                }
               >
                 {children}
               </a>
@@ -268,13 +322,27 @@ export default function ChatPage() {
             ),
             // Strong/Bold
             strong: ({ children }) => (
-              <strong className={`font-bold ${isUser ? "text-primary-foreground" : "text-gray-900 dark:text-gray-100"}`}>
+              <strong
+                className={`font-bold ${
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+              >
                 {children}
               </strong>
             ),
             // Emphasis/Italic
             em: ({ children }) => (
-              <em className={`italic ${isUser ? "text-primary-foreground" : "text-gray-800 dark:text-gray-200"}`}>{children}</em>
+              <em
+                className={`italic ${
+                  isUser
+                    ? "text-primary-foreground"
+                    : "text-gray-800 dark:text-gray-200"
+                }`}
+              >
+                {children}
+              </em>
             ),
           }}
         >
@@ -326,7 +394,8 @@ export default function ChatPage() {
   const [deleteChatSessionModal, setDeleteChatSessionModal] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [abortController, setAbortController] =
+    useState<AbortController | null>(null);
   const [streamingEnabled, setStreamingEnabled] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -348,8 +417,8 @@ export default function ChatPage() {
     // Set initial state
     handleResize();
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const stopGeneration = () => {
@@ -481,9 +550,9 @@ export default function ChatPage() {
   }, [sessionId, editedName]);
   useEffect(() => {
     if (newChatSessionBtnRef.current && !showSplash) {
-    newChatSessionBtnRef.current.disabled = true;
-  }
-  },[showSplash]);
+      newChatSessionBtnRef.current.disabled = true;
+    }
+  }, [showSplash]);
   useEffect(() => {
     if (chatSessions.some((session) => session.id === "1")) {
       // welcomeSession exists, disable new chat button
@@ -553,10 +622,11 @@ export default function ChatPage() {
     setInput("");
 
     // Use streaming endpoint for text-only messages (if streaming is enabled), regular endpoint for file uploads or when streaming is disabled
-    const endpoint = uploadedFile || !streamingEnabled
-      ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`
-      : `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/stream`;
-    
+    const endpoint =
+      uploadedFile || !streamingEnabled
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`
+        : `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/stream`;
+
     // Only set typing indicator for file uploads (non-streaming cases) or when streaming is disabled
     if (uploadedFile || !streamingEnabled) {
       setIsTyping(true);
@@ -612,7 +682,10 @@ export default function ChatPage() {
           timestamp: new Date(data.timestamp),
         };
 
-        if (newChatSessionBtnRef.current && newChatSessionBtnRef.current.disabled) {
+        if (
+          newChatSessionBtnRef.current &&
+          newChatSessionBtnRef.current.disabled
+        ) {
           newChatSessionBtnRef.current.disabled = false;
         }
 
@@ -664,21 +737,21 @@ export default function ChatPage() {
           if (done) break;
 
           const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+          const lines = chunk.split("\n");
 
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
+            if (line.startsWith("data: ")) {
               try {
                 const data = JSON.parse(line.slice(6));
-                
+
                 switch (data.type) {
-                  case 'session_info':
+                  case "session_info":
                     if (data.session_id && data.session_id !== sessionId) {
                       finalSessionId = data.session_id;
                     }
                     break;
-                    
-                  case 'chunk':
+
+                  case "chunk":
                     // If this is the first chunk and we still have "..." as content, clear it first
                     if (streamedContent === "" && data.text) {
                       streamedContent = data.text;
@@ -686,44 +759,50 @@ export default function ChatPage() {
                       streamedContent += data.text;
                     }
                     // Update the temporary message with streamed content
-                    setMessages((prev) => 
-                      prev.map((msg) => 
-                        msg.id === tempAssistantMessage.id 
+                    setMessages((prev) =>
+                      prev.map((msg) =>
+                        msg.id === tempAssistantMessage.id
                           ? { ...msg, content: streamedContent }
                           : msg
                       )
                     );
                     break;
-                    
-                  case 'complete':
+
+                  case "complete":
                     if (data.session_id && sessionId === "1") {
                       setSessionId(data.session_id);
                       localStorage.setItem(
                         "chat_sessions",
                         JSON.stringify([
-                          ...JSON.parse(localStorage.getItem("chat_sessions") || "[]"),
+                          ...JSON.parse(
+                            localStorage.getItem("chat_sessions") || "[]"
+                          ),
                           data.session_id,
                         ])
                       );
                     }
-                    
+
                     // Update final message with timestamp
-                    setMessages((prev) => 
-                      prev.map((msg) => 
-                        msg.id === tempAssistantMessage.id 
-                          ? { ...msg, content: streamedContent, timestamp: new Date(data.timestamp) }
+                    setMessages((prev) =>
+                      prev.map((msg) =>
+                        msg.id === tempAssistantMessage.id
+                          ? {
+                              ...msg,
+                              content: streamedContent,
+                              timestamp: new Date(data.timestamp),
+                            }
                           : msg
                       )
                     );
-                    
+
                     latencyValue = data.latency?.toString() || "0";
                     break;
-                    
-                  case 'error':
+
+                  case "error":
                     streamedContent = data.message;
-                    setMessages((prev) => 
-                      prev.map((msg) => 
-                        msg.id === tempAssistantMessage.id 
+                    setMessages((prev) =>
+                      prev.map((msg) =>
+                        msg.id === tempAssistantMessage.id
                           ? { ...msg, content: streamedContent }
                           : msg
                       )
@@ -739,38 +818,47 @@ export default function ChatPage() {
         }
       }
 
-      if (newChatSessionBtnRef.current && newChatSessionBtnRef.current.disabled) {
+      if (
+        newChatSessionBtnRef.current &&
+        newChatSessionBtnRef.current.disabled
+      ) {
         newChatSessionBtnRef.current.disabled = false;
       }
 
       setIsStreaming(false);
       setAbortController(null);
       setLatency(latencyValue);
-
     } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.log('Generation was stopped by user');
+      if (error.name === "AbortError") {
+        console.log("Generation was stopped by user");
         // Update the temp message to show it was stopped
-        setMessages((prev) => 
-          prev.map((msg) => 
-            msg.id === tempAssistantMessage.id 
-              ? { ...msg, content: (msg.content || '') + '\n\n[Generation stopped by user]' }
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === tempAssistantMessage.id
+              ? {
+                  ...msg,
+                  content:
+                    (msg.content || "") + "\n\n[Generation stopped by user]",
+                }
               : msg
           )
         );
       } else {
         console.error("Failed to receive response from AI", error);
-        
+
         // Update the temp message with error
-        setMessages((prev) => 
-          prev.map((msg) => 
-            msg.id === tempAssistantMessage.id 
-              ? { ...msg, content: "Failed to get response from AI. Please try again." }
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === tempAssistantMessage.id
+              ? {
+                  ...msg,
+                  content: "Failed to get response from AI. Please try again.",
+                }
               : msg
           )
         );
       }
-      
+
       setIsStreaming(false);
       setAbortController(null);
     }
@@ -1153,26 +1241,42 @@ export default function ChatPage() {
     <div className="flex h-screen bg-background">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed lg:static inset-y-0 left-0 z-50 bg-background border-r transform transition-all duration-300 ease-in-out ${
-        isSidebarOpen
-          ? 'translate-x-0 w-80 lg:w-80'
-          : '-translate-x-full lg:translate-x-0 lg:w-0 lg:border-r-0'
-      }`}>
+      <div
+        className={`fixed overflow-auto 
+  [&::-webkit-scrollbar]:w-1.5 
+  [&::-webkit-scrollbar-track]:bg-transparent 
+  [&::-webkit-scrollbar-thumb]:bg-gray-300 
+  [&::-webkit-scrollbar-thumb]:rounded-sm
+  [&::-webkit-scrollbar-thumb:hover]:bg-gray-400
+  dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 
+  dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500
+  lg:static inset-y-0 left-0 z-50 bg-background border-r transform transition-all duration-300 ease-in-out ${
+    isSidebarOpen
+      ? "translate-x-0 w-80 lg:w-80"
+      : "-translate-x-full lg:translate-x-0 lg:w-0 lg:border-r-0"
+  }`}
+      >
         {/* Sidebar Header */}
-        <div className={`p-4 border-b ${!isSidebarOpen ? 'lg:hidden' : ''}`}>
-          <div className="flex items-center justify-between mb-4">
+        <div
+          className={`sticky top-0 z-10 bg-background/80 backdrop-blur-xl border-b px-4 py-4 ${
+            !isSidebarOpen ? "lg:hidden" : ""
+          }`}
+        >
+          <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold lg:block">PrivGPT Studio</span>
+              <span className="text-xl  font-bold lg:block">
+                PrivGPT Studio
+              </span>
             </Link>
             <div className="flex items-center space-x-2">
               <ThemeToggle />
@@ -1195,9 +1299,10 @@ export default function ChatPage() {
               </Button>
             </div>
           </div>
-
+        </div>
+        <div className="flex-1 mt-5 px-2">
           {/* Navigation */}
-          <nav className={`space-y-2 ${!isSidebarOpen ? 'lg:hidden' : ''}`}>
+          <nav className={`space-y-2 ${!isSidebarOpen ? "lg:hidden" : ""}`}>
             <Collapsible
               open={isChatSessionsCollapsed}
               onOpenChange={setIsChatSessionsCollapsed}
@@ -1332,114 +1437,118 @@ export default function ChatPage() {
               </Link>
             </Button>
           </nav>
-        </div>
 
-        {/* Model Selection */}
-        <div className={`p-4 border-b ${!isSidebarOpen ? 'lg:hidden' : ''}`}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">AI Model</h3>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-muted-foreground">Stream</span>
-              <Switch
-                checked={streamingEnabled}
-                onCheckedChange={setStreamingEnabled}
-              />
+          {/* Model Selection */}
+          <div className={`p-4 border-b ${!isSidebarOpen ? "lg:hidden" : ""}`}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold">AI Model</h3>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-muted-foreground">Stream</span>
+                <Switch
+                  checked={streamingEnabled}
+                  onCheckedChange={setStreamingEnabled}
+                />
+              </div>
             </div>
+            <Select
+              value={selectedModel}
+              onValueChange={(model: string) => {
+                setSelectedModel(model);
+                setSelectedModelType(
+                  localModels.includes(model) ? "local" : "cloud"
+                );
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="px-2 py-1 text-xs text-muted-foreground">
+                  Local Models
+                </div>
+                {localModels.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    <div className="flex items-center">
+                      <Cpu className="w-4 h-4 mr-2" />
+                      {model}
+                    </div>
+                  </SelectItem>
+                ))}
+
+                <div className="px-2 py-1 text-xs text-muted-foreground mt-2">
+                  Cloud Models
+                </div>
+                {cloudModels.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    <div className="flex items-center">
+                      <Globe className="w-4 h-4 mr-2" />
+                      {model}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select
-            value={selectedModel}
-            onValueChange={(model: string) => {
-              setSelectedModel(model);
-              setSelectedModelType(
-                localModels.includes(model) ? "local" : "cloud"
-              );
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <div className="px-2 py-1 text-xs text-muted-foreground">
-                Local Models
-              </div>
-              {localModels.map((model) => (
-                <SelectItem key={model} value={model}>
-                  <div className="flex items-center">
-                    <Cpu className="w-4 h-4 mr-2" />
-                    {model}
-                  </div>
-                </SelectItem>
-              ))}
 
-              <div className="px-2 py-1 text-xs text-muted-foreground mt-2">
-                Cloud Models
-              </div>
-              {cloudModels.map((model) => (
-                <SelectItem key={model} value={model}>
-                  <div className="flex items-center">
-                    <Globe className="w-4 h-4 mr-2" />
-                    {model}
+          {/* Usage Stats */}
+          <div className={`p-4 flex-1 ${!isSidebarOpen ? "lg:hidden" : ""}`}>
+            <h3 className="font-semibold mb-3">Usage Stats</h3>
+            <div className="space-y-3">
+              <Card>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Activity className="w-4 h-4 mr-2 text-green-500" />
+                      <span className="text-sm">Internet Status</span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className={
+                        status === "Online" ? "text-green-600" : "text-red-600"
+                      }
+                    >
+                      {status}
+                    </Badge>
                   </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+                </CardContent>
+              </Card>
 
-        {/* Usage Stats */}
-        <div className={`p-4 flex-1 ${!isSidebarOpen ? 'lg:hidden' : ''}`}>
-          <h3 className="font-semibold mb-3">Usage Stats</h3>
-          <div className="space-y-3">
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Activity className="w-4 h-4 mr-2 text-green-500" />
-                    <span className="text-sm">Internet Status</span>
+              <Card>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <MessageSquare className="w-4 h-4 mr-2 text-blue-500" />
+                      <span className="text-sm">Messages</span>
+                    </div>
+                    <span className="text-sm font-medium">
+                      {messages.length}
+                    </span>
                   </div>
-                  <Badge
-                    variant="secondary"
-                    className={
-                      status === "Online" ? "text-green-600" : "text-red-600"
-                    }
-                  >
-                    {status}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <MessageSquare className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="text-sm">Messages</span>
+              <Card>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Clock className="w-4 h-4 mr-2 text-orange-500" />
+                      <span className="text-sm">Latency</span>
+                    </div>
+                    <span className="text-sm font-medium">{latency}ms</span>
                   </div>
-                  <span className="text-sm font-medium">{messages.length}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                    <span className="text-sm">Latency</span>
-                  </div>
-                  <span className="text-sm font-medium">{latency}ms</span>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Chat Panel */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${
-        isSidebarOpen ? 'lg:ml-0' : 'lg:ml-0'
-      }`}>
+      <div
+        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? "lg:ml-0" : "lg:ml-0"
+        }`}
+      >
         {/* Chat Header with Hamburger */}
         <div className="border-b p-4">
           <div className="flex items-center justify-between">
@@ -1509,9 +1618,9 @@ export default function ChatPage() {
                     </div>
                   )}
                   <div>
-                    <MessageContent 
-                      content={message.content} 
-                      isLoading={message.content === '...'} 
+                    <MessageContent
+                      content={message.content}
+                      isLoading={message.content === "..."}
                       isUser={message.role === "user"}
                     />
                   </div>
