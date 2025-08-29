@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
+import SplashScreen from "../splashScreen";
+import { useState, useEffect } from "react";
 import {
     Github,
     Twitter,
@@ -22,6 +24,14 @@ import {
 import Link from "next/link";
 
 export default function AboutPage() {
+    const [showSplash, setShowSplash] = useState(true);
+    
+      useEffect(() => {
+        const timer = setTimeout(() => setShowSplash(false), 100);
+        return () => clearTimeout(timer);
+      }, []);
+    
+      if (showSplash) return <SplashScreen />;
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
