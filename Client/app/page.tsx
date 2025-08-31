@@ -39,6 +39,12 @@ export default function HomePage() {
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
+            <Link href="/" className="text-muted-foreground hover:text-foreground">
+              Home
+            </Link>
+            <Link href="/about">
+              <Button variant="ghost">About Us</Button>
+            </Link>
             <Link href="/chat">
               <Button variant="outline">Try Chat</Button>
             </Link>
