@@ -11,10 +11,52 @@ import SplashScreen from "./splashScreen";
 import { useState, useEffect } from "react";
 import { Head } from "react-day-picker";
 import ScrollToTop from "@/components/ui/scroll-to-top";
+import type { Metadata } from "next";
 
-
-
-
+export const metadata: Metadata = {
+  title: "PrivGPT Studio | AI Chat with Cloud & Local Models",
+  description:
+    "Experience the future of AI conversations with PrivGPT Studio. Switch seamlessly between cloud-powered Gemini and privacy-focused local models — secure, fast, and intuitive.",
+  keywords: [
+    "AI chat",
+    "Gemini AI",
+    "local AI models",
+    "PrivGPT Studio",
+    "privacy-focused AI",
+    "AI conversations",
+    "AI chatbot",
+    "offline AI",
+  ],
+  authors: [{ name: "PrivGPT Studio Team" }],
+  openGraph: {
+    title: "PrivGPT Studio | AI Chat with Cloud & Local Models",
+    description:
+      "Switch between Gemini (cloud) and local AI models for secure, seamless conversations. Try it free today!",
+    url: "https://privgpt-studio.vercel.app/", // replace with real domain
+    siteName: "PrivGPT Studio",
+    images: [
+      {
+        url: "https://privgpt-studio.vercel.app/logo.png", // add a nice preview image
+        width: 1200,
+        height: 630,
+        alt: "PrivGPT Studio AI Chat Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PrivGPT Studio | AI Chat with Cloud & Local Models",
+    description:
+      "Experience seamless AI chat with both cloud-powered Gemini and private local models.",
+    images: ["https://privgpt-studio.vercel.app/logo.png"], // same as OG image
+  },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+};
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
@@ -39,7 +81,10 @@ export default function HomePage() {
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
+            <Link
+              href="/"
+              className="text-muted-foreground hover:text-foreground"
+            >
               Home
             </Link>
             <Link href="/about">
@@ -230,8 +275,10 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg
-" />
+                    <AvatarImage
+                      src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg
+"
+                    />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <div>
@@ -259,9 +306,11 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="
+                    <AvatarImage
+                      src="
 https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51ba7df8
-" />
+"
+                    />
                     <AvatarFallback>SM</AvatarFallback>
                   </Avatar>
                   <div>

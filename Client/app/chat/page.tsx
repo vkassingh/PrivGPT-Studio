@@ -75,6 +75,48 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI Chat | PrivGPT Studio - Chat with Local & Cloud AI Models",
+  description:
+    "Experience seamless, private conversations with AI. Chat in real-time using powerful local models or cloud-powered Gemini. Export your history and manage your chats effortlessly.",
+  keywords: [
+    "AI chat",
+    "real-time AI conversation",
+    "local AI models",
+    "Gemini AI chat",
+    "private AI chat",
+    "chat with AI",
+    "export chat history",
+    "PrivGPT Studio chat",
+  ],
+  openGraph: {
+    title: "AI Chat | PrivGPT Studio - Chat with Local & Cloud AI Models",
+    description:
+      "Experience seamless, private conversations with AI. Chat in real-time using powerful local models or cloud-powered Gemini.",
+    url: "https://privgpt-studio.vercel.app/chat",
+    type: "website",
+    images: [
+      {
+        url: "https://privgpt-studio.vercel.app/logo.png", // Create an OG image for the chat interface
+        width: 1200,
+        height: 630,
+        alt: "PrivGPT Studio AI Chat Interface Preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI Chat | PrivGPT Studio",
+    description:
+      "Chat in real-time with AI using local or cloud models. A seamless and private conversation experience.",
+    images: ["https://privgpt-studio.vercel.app/logo.png"],
+  },
+  alternates: {
+    canonical: "https://privgpt-studio.vercel.app/chat",
+  },
+};
 
 interface Message {
   id: string;
@@ -1577,13 +1619,15 @@ export default function ChatPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 
+        <div
+          className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 
   [&::-webkit-scrollbar-track]:bg-transparent 
   [&::-webkit-scrollbar-thumb]:bg-gray-300 
   [&::-webkit-scrollbar-thumb]:rounded-sm
   [&::-webkit-scrollbar-thumb:hover]:bg-gray-400
   dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 
-  dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500 p-4 space-y-4">
+  dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500 p-4 space-y-4"
+        >
           {messages.map((message) => (
             <div
               key={message.id}

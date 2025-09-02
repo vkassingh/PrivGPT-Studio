@@ -6,6 +6,48 @@ import { Separator } from "@/components/ui/separator";
 import { Zap, FileText, Clock, Mail } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service | PrivGPT Studio - Usage Guidelines & Policies",
+  description:
+    "PrivGPT Studio's Terms of Service. Learn about user responsibilities, prohibited activities, intellectual property rights, and platform usage guidelines for our AI chat service.",
+  keywords: [
+    "Terms of Service",
+    "AI usage policy",
+    "user guidelines",
+    "platform rules",
+    "PrivGPT Studio terms",
+    "AI chat terms",
+    "prohibited activities",
+    "intellectual property AI",
+  ],
+  openGraph: {
+    title: "Terms of Service | PrivGPT Studio - Usage Guidelines & Policies",
+    description:
+      "Read PrivGPT Studio's Terms of Service covering user responsibilities, prohibited activities, and intellectual property rights for AI chat usage.",
+    url: "https://privgpt-studio.vercel.app/terms",
+    type: "website",
+    images: [
+      {
+        url: "https://privgpt-studio.vercel.app/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "PrivGPT Studio Terms of Service Overview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service | PrivGPT Studio",
+    description:
+      "Usage guidelines and policies for PrivGPT Studio's AI chat platform. Learn about responsible use and prohibited activities.",
+    images: ["https://privgpt-studio.vercel.app/logo.png"],
+  },
+  alternates: {
+    canonical: "https://privgpt-studio.vercel.app/terms",
+  },
+};
 
 export default function TermsOfService() {
   return (
@@ -40,7 +82,8 @@ export default function TermsOfService() {
               <h1 className="text-4xl font-bold">Terms of Service</h1>
             </div>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Rules and guidelines you need to know. Use the platform responsibly.
+              Rules and guidelines you need to know. Use the platform
+              responsibly.
             </p>
             <div className="flex items-center justify-center mt-4 text-sm text-muted-foreground">
               <Clock className="w-4 h-4 mr-2" />
@@ -54,7 +97,6 @@ export default function TermsOfService() {
       <section className="py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="prose prose-lg dark:prose-invert max-w-none">
-
             {/* Section 1 */}
             <Card className="mb-8">
               <CardHeader>
@@ -62,7 +104,8 @@ export default function TermsOfService() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  Users must use PrivGPT-Studio responsibly and comply with all applicable laws.
+                  Users must use PrivGPT-Studio responsibly and comply with all
+                  applicable laws.
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>Provide accurate information when creating accounts.</li>
@@ -79,7 +122,8 @@ export default function TermsOfService() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  Users are strictly prohibited from engaging in activities that violate the law or infringe on others' rights.
+                  Users are strictly prohibited from engaging in activities that
+                  violate the law or infringe on others' rights.
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>Uploading malicious or harmful content.</li>
@@ -88,7 +132,8 @@ export default function TermsOfService() {
                 </ul>
                 <div className="bg-red-50 dark:bg-red-950/30 p-4 rounded-lg">
                   <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                    <strong>We Never:</strong> Allow illegal activity, harassment, or data misuse on PrivGPT-Studio.
+                    <strong>We Never:</strong> Allow illegal activity,
+                    harassment, or data misuse on PrivGPT-Studio.
                   </p>
                 </div>
               </CardContent>
@@ -101,12 +146,19 @@ export default function TermsOfService() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  All content on PrivGPT-Studio, including text, images, and software, is owned by PrivGPT-Studio or its licensors.
+                  All content on PrivGPT-Studio, including text, images, and
+                  software, is owned by PrivGPT-Studio or its licensors.
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>You may use AI outputs for personal, research, or internal purposes.</li>
+                  <li>
+                    You may use AI outputs for personal, research, or internal
+                    purposes.
+                  </li>
                   <li>Respect other users and follow platform rules.</li>
-                  <li>Do not redistribute or sell platform content without permission.</li>
+                  <li>
+                    Do not redistribute or sell platform content without
+                    permission.
+                  </li>
                 </ul>
               </CardContent>
             </Card>
@@ -118,7 +170,8 @@ export default function TermsOfService() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  PrivGPT-Studio is provided "as is" without warranties. We are not liable for indirect or consequential damages.
+                  PrivGPT-Studio is provided "as is" without warranties. We are
+                  not liable for indirect or consequential damages.
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>No guarantee of uninterrupted or error-free service.</li>
@@ -135,11 +188,15 @@ export default function TermsOfService() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  We may update these Terms of Service occasionally. Continued use of the platform indicates acceptance of updates.
+                  We may update these Terms of Service occasionally. Continued
+                  use of the platform indicates acceptance of updates.
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   <li>Changes will be posted on this page.</li>
-                  <li>Important changes may be communicated via email or notifications.</li>
+                  <li>
+                    Important changes may be communicated via email or
+                    notifications.
+                  </li>
                 </ul>
               </CardContent>
             </Card>
@@ -159,16 +216,19 @@ export default function TermsOfService() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <h4 className="font-semibold mb-2">Support Email</h4>
-                    <p className="text-sm text-muted-foreground">support@privgptstudio.com</p>
+                    <p className="text-sm text-muted-foreground">
+                      support@privgptstudio.com
+                    </p>
                   </div>
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <h4 className="font-semibold mb-2">Legal Department</h4>
-                    <p className="text-sm text-muted-foreground">legal@privgptstudio.com</p>
+                    <p className="text-sm text-muted-foreground">
+                      legal@privgptstudio.com
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
           </div>
         </div>
       </section>
@@ -186,16 +246,28 @@ export default function TermsOfService() {
             Committed to transparency and responsible use.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
+            <Link
+              href="/"
+              className="text-muted-foreground hover:text-foreground"
+            >
               Home
             </Link>
-            <Link href="/chat" className="text-muted-foreground hover:text-foreground">
+            <Link
+              href="/chat"
+              className="text-muted-foreground hover:text-foreground"
+            >
               Chat
             </Link>
-            <Link href="/privacy-policy" className="text-muted-foreground hover:text-foreground">
+            <Link
+              href="/privacy-policy"
+              className="text-muted-foreground hover:text-foreground"
+            >
               Privacy Policy
             </Link>
-            <Link href="/support" className="text-muted-foreground hover:text-foreground">
+            <Link
+              href="/support"
+              className="text-muted-foreground hover:text-foreground"
+            >
               Support
             </Link>
           </div>
