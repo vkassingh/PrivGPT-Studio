@@ -28,3 +28,6 @@ venv/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# __pycache__
+__pycache__/
