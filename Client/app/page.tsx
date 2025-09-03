@@ -9,54 +9,8 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import SplashScreen from "./splashScreen";
 import { useState, useEffect } from "react";
-import { Head } from "react-day-picker";
+import Head from "next/head";
 import ScrollToTop from "@/components/ui/scroll-to-top";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "PrivGPT Studio | AI Chat with Cloud & Local Models",
-  description:
-    "Experience the future of AI conversations with PrivGPT Studio. Switch seamlessly between cloud-powered Gemini and privacy-focused local models — secure, fast, and intuitive.",
-  keywords: [
-    "AI chat",
-    "Gemini AI",
-    "local AI models",
-    "PrivGPT Studio",
-    "privacy-focused AI",
-    "AI conversations",
-    "AI chatbot",
-    "offline AI",
-  ],
-  authors: [{ name: "PrivGPT Studio Team" }],
-  openGraph: {
-    title: "PrivGPT Studio | AI Chat with Cloud & Local Models",
-    description:
-      "Switch between Gemini (cloud) and local AI models for secure, seamless conversations. Try it free today!",
-    url: "https://privgpt-studio.vercel.app/", // replace with real domain
-    siteName: "PrivGPT Studio",
-    images: [
-      {
-        url: "https://privgpt-studio.vercel.app/logo.png", // add a nice preview image
-        width: 1200,
-        height: 630,
-        alt: "PrivGPT Studio AI Chat Preview",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "PrivGPT Studio | AI Chat with Cloud & Local Models",
-    description:
-      "Experience seamless AI chat with both cloud-powered Gemini and private local models.",
-    images: ["https://privgpt-studio.vercel.app/logo.png"], // same as OG image
-  },
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
-};
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
@@ -70,6 +24,61 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Head>
+        <title>PrivGPT Studio | AI Chat with Cloud & Local Models</title>
+        <meta
+          name="description"
+          content="Experience the future of AI conversations with PrivGPT Studio. Switch seamlessly between cloud-powered Gemini and privacy-focused local models — secure, fast, and intuitive."
+        />
+        <meta
+          name="keywords"
+          content="AI chat, Gemini AI, local AI models, PrivGPT Studio, privacy-focused AI, AI conversations, AI chatbot, offline AI"
+        />
+        <meta name="author" content="PrivGPT Studio Team" />
+
+        {/* Open Graph */}
+        <meta
+          property="og:title"
+          content="PrivGPT Studio | AI Chat with Cloud & Local Models"
+        />
+        <meta
+          property="og:description"
+          content="Switch between Gemini (cloud) and local AI models for secure, seamless conversations. Try it free today!"
+        />
+        <meta property="og:url" content="https://privgpt-studio.vercel.app/" />
+        <meta property="og:site_name" content="PrivGPT Studio" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content="PrivGPT Studio AI Chat Preview"
+        />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="PrivGPT Studio | AI Chat with Cloud & Local Models"
+        />
+        <meta
+          name="twitter:description"
+          content="Experience seamless AI chat with both cloud-powered Gemini and private local models."
+        />
+        <meta
+          name="twitter:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+
+        {/* Icons */}
+        <link rel="icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+      </Head>
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

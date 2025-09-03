@@ -16,52 +16,67 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Privacy Policy | PrivGPT Studio - Your Data Security & Privacy",
-  description:
-    "PrivGPT Studio's commitment to your privacy. Learn how we protect your data with local AI processing, strict no-sale policies, and compliance with GDPR, CCPA, and global privacy laws.",
-  keywords: [
-    "AI privacy policy",
-    "data protection",
-    "GDPR compliance",
-    "CCPA compliance",
-    "local AI privacy",
-    "chat data security",
-    "PrivGPT Studio privacy",
-    "AI data retention",
-  ],
-  openGraph: {
-    title: "Privacy Policy | PrivGPT Studio - Your Data Security & Privacy",
-    description:
-      "Learn how PrivGPT Studio protects your conversations with local AI processing and strict privacy safeguards compliant with GDPR and CCPA.",
-    url: "https://privgpt-studio.vercel.app/privacy-policy",
-    type: "website",
-    images: [
-      {
-        url: "https://privgpt-studio.vercel.app/logo.png",
-        width: 1200,
-        height: 630,
-        alt: "PrivGPT Studio Privacy Policy Overview",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Privacy Policy | PrivGPT Studio",
-    description:
-      "Your privacy is our priority. Learn how we protect your AI conversations with local processing and strict data safeguards.",
-    images: ["https://privgpt-studio.vercel.app/logo.png"],
-  },
-  alternates: {
-    canonical: "https://privgpt-studio.vercel.app/privacy-policy",
-  },
-};
+import Head from "next/head";
 
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-background">
+      <Head>
+        <title>
+          Privacy Policy | PrivGPT Studio - Your Data Security & Privacy
+        </title>
+        <meta
+          name="description"
+          content="PrivGPT Studio's commitment to your privacy. Learn how we protect your data with local AI processing, strict no-sale policies, and compliance with GDPR, CCPA, and global privacy laws."
+        />
+        <meta
+          name="keywords"
+          content="AI privacy policy, data protection, GDPR compliance, CCPA compliance, local AI privacy, chat data security, PrivGPT Studio privacy, AI data retention"
+        />
+
+        {/* Open Graph */}
+        <meta
+          property="og:title"
+          content="Privacy Policy | PrivGPT Studio - Your Data Security & Privacy"
+        />
+        <meta
+          property="og:description"
+          content="Learn how PrivGPT Studio protects your conversations with local AI processing and strict privacy safeguards compliant with GDPR and CCPA."
+        />
+        <meta
+          property="og:url"
+          content="https://privgpt-studio.vercel.app/privacy-policy"
+        />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content="PrivGPT Studio Privacy Policy Overview"
+        />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Privacy Policy | PrivGPT Studio" />
+        <meta
+          name="twitter:description"
+          content="Your privacy is our priority. Learn how we protect your AI conversations with local processing and strict data safeguards."
+        />
+        <meta
+          name="twitter:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+
+        {/* Canonical */}
+        <link
+          rel="canonical"
+          href="https://privgpt-studio.vercel.app/privacy-policy"
+        />
+      </Head>
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

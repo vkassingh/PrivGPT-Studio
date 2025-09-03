@@ -6,52 +6,67 @@ import { Separator } from "@/components/ui/separator";
 import { Zap, FileText, Clock, Mail } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Terms of Service | PrivGPT Studio - Usage Guidelines & Policies",
-  description:
-    "PrivGPT Studio's Terms of Service. Learn about user responsibilities, prohibited activities, intellectual property rights, and platform usage guidelines for our AI chat service.",
-  keywords: [
-    "Terms of Service",
-    "AI usage policy",
-    "user guidelines",
-    "platform rules",
-    "PrivGPT Studio terms",
-    "AI chat terms",
-    "prohibited activities",
-    "intellectual property AI",
-  ],
-  openGraph: {
-    title: "Terms of Service | PrivGPT Studio - Usage Guidelines & Policies",
-    description:
-      "Read PrivGPT Studio's Terms of Service covering user responsibilities, prohibited activities, and intellectual property rights for AI chat usage.",
-    url: "https://privgpt-studio.vercel.app/terms",
-    type: "website",
-    images: [
-      {
-        url: "https://privgpt-studio.vercel.app/logo.png",
-        width: 1200,
-        height: 630,
-        alt: "PrivGPT Studio Terms of Service Overview",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Terms of Service | PrivGPT Studio",
-    description:
-      "Usage guidelines and policies for PrivGPT Studio's AI chat platform. Learn about responsible use and prohibited activities.",
-    images: ["https://privgpt-studio.vercel.app/logo.png"],
-  },
-  alternates: {
-    canonical: "https://privgpt-studio.vercel.app/terms",
-  },
-};
+import Head from "next/head";
 
 export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-background">
+      <Head>
+        <title>
+          Terms of Service | PrivGPT Studio - Usage Guidelines & Policies
+        </title>
+        <meta
+          name="description"
+          content="PrivGPT Studio's Terms of Service. Learn about user responsibilities, prohibited activities, intellectual property rights, and platform usage guidelines for our AI chat service."
+        />
+        <meta
+          name="keywords"
+          content="Terms of Service, AI usage policy, user guidelines, platform rules, PrivGPT Studio terms, AI chat terms, prohibited activities, intellectual property AI"
+        />
+
+        {/* Open Graph */}
+        <meta
+          property="og:title"
+          content="Terms of Service | PrivGPT Studio - Usage Guidelines & Policies"
+        />
+        <meta
+          property="og:description"
+          content="Read PrivGPT Studio's Terms of Service covering user responsibilities, prohibited activities, and intellectual property rights for AI chat usage."
+        />
+        <meta
+          property="og:url"
+          content="https://privgpt-studio.vercel.app/terms"
+        />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content="PrivGPT Studio Terms of Service Overview"
+        />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Terms of Service | PrivGPT Studio"
+        />
+        <meta
+          name="twitter:description"
+          content="Usage guidelines and policies for PrivGPT Studio's AI chat platform. Learn about responsible use and prohibited activities."
+        />
+        <meta
+          name="twitter:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+
+        {/* Canonical */}
+        <link rel="canonical" href="https://privgpt-studio.vercel.app/terms" />
+      </Head>
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
