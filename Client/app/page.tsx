@@ -42,7 +42,7 @@ export default function HomePage() {
 
           <div className="flex items-center space-x-4">
             {/* Desktop Navigation */}
-            <nav className="fixed hidden md:flex items-center space-x-4">
+            <nav className="hidden md:flex items-center space-x-4">
               <Link
                 href="/"
                 className="text-muted-foreground hover:text-foreground"
