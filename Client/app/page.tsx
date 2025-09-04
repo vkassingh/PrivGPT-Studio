@@ -9,12 +9,8 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import SplashScreen from "./splashScreen";
 import { useState, useEffect } from "react";
-import { Head } from "react-day-picker";
+import Head from "next/head";
 import ScrollToTop from "@/components/ui/scroll-to-top";
-
-
-
-
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
@@ -28,6 +24,61 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Head>
+        <title>PrivGPT Studio | AI Chat with Cloud & Local Models</title>
+        <meta
+          name="description"
+          content="Experience the future of AI conversations with PrivGPT Studio. Switch seamlessly between cloud-powered Gemini and privacy-focused local models — secure, fast, and intuitive."
+        />
+        <meta
+          name="keywords"
+          content="AI chat, Gemini AI, local AI models, PrivGPT Studio, privacy-focused AI, AI conversations, AI chatbot, offline AI"
+        />
+        <meta name="author" content="PrivGPT Studio Team" />
+
+        {/* Open Graph */}
+        <meta
+          property="og:title"
+          content="PrivGPT Studio | AI Chat with Cloud & Local Models"
+        />
+        <meta
+          property="og:description"
+          content="Switch between Gemini (cloud) and local AI models for secure, seamless conversations. Try it free today!"
+        />
+        <meta property="og:url" content="https://privgpt-studio.vercel.app/" />
+        <meta property="og:site_name" content="PrivGPT Studio" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta
+          property="og:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta
+          property="og:image:alt"
+          content="PrivGPT Studio AI Chat Preview"
+        />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="PrivGPT Studio | AI Chat with Cloud & Local Models"
+        />
+        <meta
+          name="twitter:description"
+          content="Experience seamless AI chat with both cloud-powered Gemini and private local models."
+        />
+        <meta
+          name="twitter:image"
+          content="https://privgpt-studio.vercel.app/logo.png"
+        />
+
+        {/* Icons */}
+        <link rel="icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+      </Head>
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -39,7 +90,10 @@ export default function HomePage() {
           </div>
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
+            <Link
+              href="/"
+              className="text-muted-foreground hover:text-foreground"
+            >
               Home
             </Link>
             <Link href="/about">
@@ -230,8 +284,10 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg
-" />
+                    <AvatarImage
+                      src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg
+"
+                    />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <div>
@@ -259,9 +315,11 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="
+                    <AvatarImage
+                      src="
 https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51ba7df8
-" />
+"
+                    />
                     <AvatarFallback>SM</AvatarFallback>
                   </Avatar>
                   <div>
