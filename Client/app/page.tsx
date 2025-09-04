@@ -4,17 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Zap, Star, Github, Twitter, Mail } from "lucide-react";
+import { Zap, Star, Github, Twitter, Mail, Menu } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import SplashScreen from "./splashScreen";
 import { useState, useEffect } from "react";
-import { Head } from "react-day-picker";
 import ScrollToTop from "@/components/ui/scroll-to-top";
-
-
-
-
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
@@ -29,7 +31,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b sticky top-0 z-50 bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -37,21 +39,61 @@ export default function HomePage() {
             </div>
             <span className="text-xl font-bold">PrivGPT Studio</span>
           </div>
+
           <div className="flex items-center space-x-4">
+            {/* Desktop Navigation */}
+            <nav className="fixed hidden md:flex items-center space-x-4">
+              <Link
+                href="/"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Home
+              </Link>
+              <Link href="/about">
+                <Button variant="ghost">About Us</Button>
+              </Link>
+              <Link href="/chat">
+                <Button variant="outline">Try Chat</Button>
+              </Link>
+            </nav>
+
             <ThemeToggle />
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
-              Home
-            </Link>
-            <Link href="/about">
-              <Button variant="ghost">About Us</Button>
-            </Link>
-            <Link href="/chat">
-              <Button variant="outline">Try Chat</Button>
-            </Link>
+
+            {/* Mobile Menu */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="w-10 h-10" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <SheetHeader>
+                
+                </SheetHeader>
+                <nav className="flex flex-col gap-4 mt-8">
+                  <Link href="/">
+                    <Button variant="ghost" className="w-full justify-start">
+                      Home
+                    </Button>
+                  </Link>
+                  <Link href="/about">
+                    <Button variant="ghost" className="w-full justify-start">
+                      About Us
+                    </Button>
+                  </Link>
+                  <Link href="/chat">
+                    <Button variant="outline" className="w-full">
+                      Try Chat
+                    </Button>
+                  </Link>
+                </nav>
+              </SheetContent>
+            </Sheet>
+
           </div>
         </div>
       </header>
-
+      
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
@@ -230,8 +272,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg
-" />
+                    <AvatarImage src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg" />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <div>
@@ -259,9 +300,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="
-https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51ba7df8
-" />
+                    <AvatarImage src="https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51ba7df8" />
                     <AvatarFallback>SM</AvatarFallback>
                   </Avatar>
                   <div>
@@ -289,7 +328,7 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="https://tse1.mm.bing.net/th/id/OIP.6FXhGomoaY1IKhQp0zFPfwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3 " />
+                    <AvatarImage src="https://tse1.mm.bing.net/th/id/OIP.6FXhGomoaY1IKhQp0zFPfwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" />
                     <AvatarFallback>MJ</AvatarFallback>
                   </Avatar>
                   <div>
@@ -335,7 +374,6 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                       </div>
                     </div>
                   </div>
-
                   <div className="flex justify-end">
                     <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
                       Explain AI like I'm 5.
@@ -347,7 +385,6 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                       at patterns!
                     </div>
                   </div>
-
                   <div className="flex justify-end">
                     <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
                       Write a one-line love poem.
@@ -358,14 +395,12 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                       Your smile rewrites the code in my heart.
                     </div>
                   </div>
-
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-lg px-3 py-2 max-w-xs">
                       <div className="animate-pulse">Typing...</div>
                     </div>
                   </div>
                 </div>
-
                 <div className="mt-4 text-center">
                   <Link href="/chat">
                     <Button>Try It Yourself</Button>
