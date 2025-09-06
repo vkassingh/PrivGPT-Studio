@@ -184,8 +184,12 @@ privgpt-studio/
 │   └── env-setup-guide.md
 │   
 ├── server/          # Flask backend
-│   ├── app.py
-│   ├── requirements.txt
+│   ├── routes/ 
+│   ├── services/
+|   ├── utils/
+|   ├── __init__.py
+|   ├── app.py
+|   ├── requirements.txt
 │   └── ...
 │
 ├── LICENSE           
