@@ -4,83 +4,40 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Zap, Star, Github, Twitter, Mail } from "lucide-react";
+import { Zap, Star, Github, Twitter, Mail, Menu } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import SplashScreen from "./splashScreen";
 import { useState, useEffect } from "react";
-import Head from "next/head";
 import ScrollToTop from "@/components/ui/scroll-to-top";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 100);
     return () => clearTimeout(timer);
   }, []);
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   if (showSplash) return <SplashScreen />;
 
   return (
     <div className="min-h-screen bg-background">
-      <Head>
-        <title>PrivGPT Studio | AI Chat with Cloud & Local Models</title>
-        <meta
-          name="description"
-          content="Experience the future of AI conversations with PrivGPT Studio. Switch seamlessly between cloud-powered Gemini and privacy-focused local models — secure, fast, and intuitive."
-        />
-        <meta
-          name="keywords"
-          content="AI chat, Gemini AI, local AI models, PrivGPT Studio, privacy-focused AI, AI conversations, AI chatbot, offline AI"
-        />
-        <meta name="author" content="PrivGPT Studio Team" />
-
-        {/* Open Graph */}
-        <meta
-          property="og:title"
-          content="PrivGPT Studio | AI Chat with Cloud & Local Models"
-        />
-        <meta
-          property="og:description"
-          content="Switch between Gemini (cloud) and local AI models for secure, seamless conversations. Try it free today!"
-        />
-        <meta property="og:url" content="https://privgpt-studio.vercel.app/" />
-        <meta property="og:site_name" content="PrivGPT Studio" />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:type" content="website" />
-        <meta
-          property="og:image"
-          content="https://privgpt-studio.vercel.app/logo.png"
-        />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-          property="og:image:alt"
-          content="PrivGPT Studio AI Chat Preview"
-        />
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="PrivGPT Studio | AI Chat with Cloud & Local Models"
-        />
-        <meta
-          name="twitter:description"
-          content="Experience seamless AI chat with both cloud-powered Gemini and private local models."
-        />
-        <meta
-          name="twitter:image"
-          content="https://privgpt-studio.vercel.app/logo.png"
-        />
-
-        {/* Icons */}
-        <link rel="icon" href="/logo.png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-      </Head>
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b sticky top-0 z-50 bg-background">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -88,24 +45,67 @@ export default function HomePage() {
             </div>
             <span className="text-xl font-bold">PrivGPT Studio</span>
           </div>
+
           <div className="flex items-center space-x-4">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-4">
+              <Link
+                href="/"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Home
+              </Link>
+              <Link href="/about">
+                <Button variant="ghost">About Us</Button>
+              </Link>
+              <Link href="/chat">
+                <Button variant="outline">Try Chat</Button>
+              </Link>
+            </nav>
+
             <ThemeToggle />
-            <Link
-              href="/"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Home
-            </Link>
-            <Link href="/about">
-              <Button variant="ghost">About Us</Button>
-            </Link>
-            <Link href="/chat">
-              <Button variant="outline">Try Chat</Button>
-            </Link>
+
+            {/* Mobile Menu */}
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-4 mt-8">
+                  <SheetClose asChild>
+                    <Link href="/">
+                      <Button variant="ghost" className="w-full justify-start" onClick={closeMobileMenu}>
+                        Home
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/about">
+                      <Button variant="ghost" className="w-full justify-start" onClick={closeMobileMenu}>
+                        About Us
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/chat">
+                      <Button variant="outline" className="w-full" onClick={closeMobileMenu}>
+                        Try Chat
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
 
+      {/* Rest of your component remains exactly the same */}
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
@@ -284,10 +284,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage
-                      src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg
-"
-                    />
+                    <AvatarImage src="https://salondesmaires-po.fr/wp-content/uploads/2015/04/speaker-3-v2.jpg" />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
                   <div>
@@ -315,11 +312,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage
-                      src="
-https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51ba7df8
-"
-                    />
+                    <AvatarImage src="https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51ba7df8" />
                     <AvatarFallback>SM</AvatarFallback>
                   </Avatar>
                   <div>
@@ -347,7 +340,7 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                 </p>
                 <div className="flex items-center">
                   <Avatar className="w-10 h-10 mr-3">
-                    <AvatarImage src="https://tse1.mm.bing.net/th/id/OIP.6FXhGomoaY1IKhQp0zFPfwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3 " />
+                    <AvatarImage src="https://tse1.mm.bing.net/th/id/OIP.6FXhGomoaY1IKhQp0zFPfwHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" />
                     <AvatarFallback>MJ</AvatarFallback>
                   </Avatar>
                   <div>
@@ -389,11 +382,10 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                       <div className="prose prose-sm dark:prose-invert">
                         1. A day on Venus is longer than its year<br></br>
                         2. Neutron stars can spin 600 times/sec<br></br>
-                        3. Space isn’t completely silent!
+                        3. Space isn't completely silent!
                       </div>
                     </div>
                   </div>
-
                   <div className="flex justify-end">
                     <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
                       Explain AI like I'm 5.
@@ -405,7 +397,6 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                       at patterns!
                     </div>
                   </div>
-
                   <div className="flex justify-end">
                     <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
                       Write a one-line love poem.
@@ -416,14 +407,12 @@ https://s3.amazonaws.com/media.mixrank.com/profilepic/30051c3ae8729c984c3c9d8a51
                       Your smile rewrites the code in my heart.
                     </div>
                   </div>
-
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-lg px-3 py-2 max-w-xs">
                       <div className="animate-pulse">Typing...</div>
                     </div>
                   </div>
                 </div>
-
                 <div className="mt-4 text-center">
                   <Link href="/chat">
                     <Button>Try It Yourself</Button>
