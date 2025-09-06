@@ -16,22 +16,28 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 
 export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 100);
     return () => clearTimeout(timer);
   }, []);
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   if (showSplash) return <SplashScreen />;
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b sticky top-0 z-50 bg-white">
+      <header className="border-b sticky top-0 z-50 bg-background">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -60,40 +66,46 @@ export default function HomePage() {
             <ThemeToggle />
 
             {/* Mobile Menu */}
-            <Sheet>
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="w-10 h-10" />
+                  <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
                 <SheetHeader>
-                
+                  <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col gap-4 mt-8">
-                  <Link href="/">
-                    <Button variant="ghost" className="w-full justify-start">
-                      Home
-                    </Button>
-                  </Link>
-                  <Link href="/about">
-                    <Button variant="ghost" className="w-full justify-start">
-                      About Us
-                    </Button>
-                  </Link>
-                  <Link href="/chat">
-                    <Button variant="outline" className="w-full">
-                      Try Chat
-                    </Button>
-                  </Link>
+                  <SheetClose asChild>
+                    <Link href="/">
+                      <Button variant="ghost" className="w-full justify-start" onClick={closeMobileMenu}>
+                        Home
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/about">
+                      <Button variant="ghost" className="w-full justify-start" onClick={closeMobileMenu}>
+                        About Us
+                      </Button>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/chat">
+                      <Button variant="outline" className="w-full" onClick={closeMobileMenu}>
+                        Try Chat
+                      </Button>
+                    </Link>
+                  </SheetClose>
                 </nav>
               </SheetContent>
             </Sheet>
-
           </div>
         </div>
       </header>
-      
+
+      {/* Rest of your component remains exactly the same */}
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
@@ -370,7 +382,7 @@ export default function HomePage() {
                       <div className="prose prose-sm dark:prose-invert">
                         1. A day on Venus is longer than its year<br></br>
                         2. Neutron stars can spin 600 times/sec<br></br>
-                        3. Space isn’t completely silent!
+                        3. Space isn't completely silent!
                       </div>
                     </div>
                   </div>
