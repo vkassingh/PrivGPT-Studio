@@ -75,6 +75,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import Head from "next/head";
 
 interface Message {
   id: string;
@@ -133,6 +134,59 @@ export default function ChatPage() {
 
     return (
       <div className="markdown-content">
+        <Head>
+          <title>
+            AI Chat | PrivGPT Studio - Chat with Local & Cloud AI Models
+          </title>
+          <meta
+            name="description"
+            content="Experience seamless, private conversations with AI. Chat in real-time using powerful local models or cloud-powered Gemini. Export your history and manage your chats effortlessly."
+          />
+          <meta
+            name="keywords"
+            content="AI chat, real-time AI conversation, local AI models, Gemini AI chat, private AI chat, chat with AI, export chat history, PrivGPT Studio chat"
+          />
+
+          {/* Open Graph */}
+          <meta
+            property="og:title"
+            content="AI Chat | PrivGPT Studio - Chat with Local & Cloud AI Models"
+          />
+          <meta
+            property="og:description"
+            content="Experience seamless, private conversations with AI. Chat in real-time using powerful local models or cloud-powered Gemini."
+          />
+          <meta property="og:type" content="website" />
+          <meta
+            property="og:url"
+            content="https://privgpt-studio.vercel.app/chat"
+          />
+          <meta
+            property="og:image"
+            content="https://privgpt-studio.vercel.app/logo.png"
+          />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta
+            property="og:image:alt"
+            content="PrivGPT Studio AI Chat Interface Preview"
+          />
+
+          {/* Twitter */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="AI Chat | PrivGPT Studio" />
+          <meta
+            name="twitter:description"
+            content="Chat in real-time with AI using local or cloud models. A seamless and private conversation experience."
+          />
+          <meta
+            name="twitter:image"
+            content="https://privgpt-studio.vercel.app/logo.png"
+          />
+
+          {/* Canonical */}
+          <link rel="canonical" href="https://privgpt-studio.vercel.app/chat" />
+        </Head>
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
           rehypePlugins={[rehypeKatex]}
@@ -1577,13 +1631,15 @@ export default function ChatPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 
+        <div
+          className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 
   [&::-webkit-scrollbar-track]:bg-transparent 
   [&::-webkit-scrollbar-thumb]:bg-gray-300 
   [&::-webkit-scrollbar-thumb]:rounded-sm
   [&::-webkit-scrollbar-thumb:hover]:bg-gray-400
   dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 
-  dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500 p-4 space-y-4">
+  dark:[&::-webkit-scrollbar-thumb:hover]:bg-gray-500 p-4 space-y-4"
+        >
           {messages.map((message) => (
             <div
               key={message.id}

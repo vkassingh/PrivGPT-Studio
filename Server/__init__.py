@@ -14,6 +14,10 @@ def create_app():
     app.config.from_object(Config)
     mongo.init_app(app)
 
+    @app.route("/")
+    def index():
+        return "Welcome to the PrivGPT-Studio Backend!"
+
     # configure the gemini model
     genai.configure(api_key=Config.GEMINI_API_KEY)
     global gemini_model
