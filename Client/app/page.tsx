@@ -427,7 +427,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -440,9 +440,29 @@ export default function HomePage() {
                 models.
               </p>
             </div>
+
+            {/* Community section */}
+             <div>
+              <h3 className="font-semibold mb-4">Community</h3>
+              <ul className="space-y-2 text-muted-foreground">
+
+                <li>
+                  <Link href="https://github.com/Rucha-Ambaliya/PrivGPT-Studio/issues" target="_blank" className="hover:text-foreground">
+                    Open Issues
+                  </Link>
+                </li>
+                <li>
+                  <Link href="https://github.com/Rucha-Ambaliya/PrivGPT-Studio?tab=readme-ov-file#-contributing" target="_blank" className="hover:text-foreground">
+                  Contribute                  
+                  </Link>
+                </li>
+                
+              </ul>
+            </div>
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-muted-foreground">
+
                 <li>
                   <Link href="/chat" className="hover:text-foreground">
                     Chat Interface
