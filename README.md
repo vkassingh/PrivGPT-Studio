@@ -43,6 +43,7 @@
 ## 🎥 Demo
 
 <h2 align="center"> <a href="https://privgpt-studio.vercel.app/"> Live Project Demo ↗️</a></h2>
+
 https://github.com/user-attachments/assets/fcaacd82-20ee-4cb0-9510-b5734b502810
 
 <h3 align="right"><a href="#top">⬆️</a></h3>
