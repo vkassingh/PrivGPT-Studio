@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Head from "next/head";
+import Layout from "@/components/layout";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -77,46 +78,8 @@ export default function PrivacyPolicyPage() {
           href="https://privgpt-studio.vercel.app/privacy-policy"
         />
       </Head>
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold">PrivGPT Studio</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            <Link href="/">
-              <Button variant="outline">Home</Button>
-            </Link>
-            <Link href="/chat">
-              <Button variant="outline">Try Chat</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-12 px-4 bg-muted/50">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <Shield className="w-12 h-12 text-primary mr-3" />
-              <h1 className="text-4xl font-bold">Privacy Policy</h1>
-            </div>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Your privacy is our priority. Learn how we collect, use, and
-              protect your data.
-            </p>
-            <div className="flex items-center justify-center mt-4 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4 mr-2" />
-              Last updated: July 28, 2025
-            </div>
-          </div>
-        </div>
-      </section>
+      
+      <Layout>
 
       {/* Quick Overview */}
       <section className="py-8 px-4">
@@ -612,50 +575,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-12 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold">PrivGPT Studio</span>
-          </div>
-          <p className="text-muted-foreground mb-4">
-            Committed to protecting your privacy and data security.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <Link
-              href="/"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Home
-            </Link>
-            <Link
-              href="/chat"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Chat
-            </Link>
-            <Link
-              href="/terms"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              href="/support"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Support
-            </Link>
-          </div>
-          <Separator className="my-6" />
-          <p className="text-sm text-muted-foreground">
-            &copy; 2025 PrivGPT Studio. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      </Layout>
     </div>
   );
 }

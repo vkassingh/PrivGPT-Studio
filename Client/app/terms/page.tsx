@@ -7,6 +7,7 @@ import { Zap, FileText, Clock, Mail } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Head from "next/head";
+import Layout from "@/components/layout";
 
 export default function TermsOfService() {
   return (
@@ -67,26 +68,8 @@ export default function TermsOfService() {
         {/* Canonical */}
         <link rel="canonical" href="https://privgpt-studio.vercel.app/terms" />
       </Head>
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold">PrivGPT Studio</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ThemeToggle />
-            <Link href="/">
-              <Button variant="outline">Home</Button>
-            </Link>
-            <Link href="/chat">
-              <Button variant="outline">Try Chat</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      
+      <Layout>
 
       {/* Hero Section */}
       <section className="py-12 px-4 bg-muted/50">
@@ -248,50 +231,7 @@ export default function TermsOfService() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-12 px-4 bg-muted/30">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold">PrivGPT Studio</span>
-          </div>
-          <p className="text-muted-foreground mb-4">
-            Committed to transparency and responsible use.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm">
-            <Link
-              href="/"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Home
-            </Link>
-            <Link
-              href="/chat"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Chat
-            </Link>
-            <Link
-              href="/privacy-policy"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/support"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Support
-            </Link>
-          </div>
-          <Separator className="my-6" />
-          <p className="text-sm text-muted-foreground">
-            &copy; 2025 PrivGPT Studio. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      </Layout>
     </div>
   );
 }
