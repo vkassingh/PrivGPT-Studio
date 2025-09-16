@@ -518,7 +518,7 @@ export default function ChatPage() {
                 | null)
             : null);
 
-        // Determine which model to select
+        // Always select the first available model as default
         let modelToSelect = "";
         let typeToSelect: "local" | "cloud" = "local";
 
@@ -530,27 +530,10 @@ export default function ChatPage() {
         ) {
           modelToSelect = storedModel;
           typeToSelect = storedType as "local" | "cloud";
-        }
-        // Second priority: Gemini if available
-        else if (cloud.some((m) => m.toLowerCase().includes("gemini"))) {
-          const gemini = cloud.find((m) => m.toLowerCase().includes("gemini"));
-          if (gemini) {
-            modelToSelect = gemini;
-            typeToSelect = "cloud";
-          }
-        }
-        // Third priority: Any cloud model with "gemini" in name
-        else if (cloud.some((m) => m.toLowerCase() === "gemini")) {
-          modelToSelect = "gemini";
-          typeToSelect = "cloud";
-        }
-        // Fourth priority: First local model
-        else if (local.length > 0) {
+        } else if (local.length > 0) {
           modelToSelect = local[0];
           typeToSelect = "local";
-        }
-        // Fifth priority: First cloud model
-        else if (cloud.length > 0) {
+        } else if (cloud.length > 0) {
           modelToSelect = cloud[0];
           typeToSelect = "cloud";
         }
