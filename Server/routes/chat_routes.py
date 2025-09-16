@@ -137,6 +137,7 @@ def chat():
         # ====== Model Handling (text only or text+mentions) ======
         bot_reply = "No reply."
         latency_ms = 0
+        fallback_used = False
         if model_type == "local":
             payload = {
                 "model": model_name,
@@ -149,7 +150,20 @@ def chat():
                 latency_ms = int((datetime.now() - latency_ms).total_seconds() * 1000)
                 bot_reply = response.json().get("response", "No reply.")
             except Exception as e:
-                bot_reply = f"Local model error: {str(e)}"
+                # Fallback to gemini if available & requested
+                try:
+                    if gemini_model:
+                        fallback_used = True
+                        model_type = "cloud"
+                        model_name = "gemini"
+                        latency_ms = datetime.now()
+                        response = gemini_model.generate_content(combined_input)
+                        latency_ms = int((datetime.now() - latency_ms).total_seconds() * 1000)
+                        bot_reply = response.text or f"Local model failed, fallback used: {str(e)}"
+                    else:
+                        bot_reply = f"Local model error (no fallback): {str(e)}"
+                except Exception as inner_e:
+                    bot_reply = f"Local & fallback error: {str(e)} | Fallback: {str(inner_e)}"
         else:
             try:
                 if model_name == "gemini":
@@ -186,7 +200,10 @@ def chat():
             "response": bot_reply,
             "session_id": session_id,
             "timestamp": messages[1]["timestamp"].isoformat(),
-            "latency": latency_ms
+            "latency": latency_ms,
+            "fallback_used": fallback_used,
+            "model_name": model_name,
+            "model_type": model_type,
         })
 
     except Exception as e:
@@ -262,31 +279,57 @@ def chat_stream():
             
             try:
                 if model_type == "local":
-                    payload = {
-                        "model": model_name,
-                        "prompt": combined_input,
-                        "stream": True,
-                    }
-                    
-                    response = requests.post("http://localhost:11434/api/generate", json=payload, stream=True, timeout=60)
-                    response.raise_for_status()
-                    
-                    for line in response.iter_lines():
-                        if line:
-                            try:
-                                chunk_data = json.loads(line.decode('utf-8'))
-                                chunk_text = chunk_data.get("response", "")
-                                if chunk_text:
-                                    bot_reply += chunk_text
-                                    yield f"data: {json.dumps({'type': 'chunk', 'text': chunk_text})}\n\n"
-                                
-                                if chunk_data.get("done", False):
+                    try:
+                        payload = {
+                            "model": model_name,
+                            "prompt": combined_input,
+                            "stream": True,
+                        }
+                        response = requests.post("http://localhost:11434/api/generate", json=payload, stream=True, timeout=60)
+                        response.raise_for_status()
+                        
+                        for line in response.iter_lines():
+                            if line:
+                                try:
+                                    chunk_data = json.loads(line.decode('utf-8'))
+                                    chunk_text = chunk_data.get("response", "")
+                                    if chunk_text:
+                                        bot_reply += chunk_text
+                                        yield f"data: {json.dumps({'type': 'chunk', 'text': chunk_text})}\n\n"
+                                    
+                                    if chunk_data.get("done", False):
+                                        break
+                                except json.JSONDecodeError:
+                                    continue
+                                except GeneratorExit:
                                     break
-                            except json.JSONDecodeError:
-                                continue
-                            except GeneratorExit:
-                                # Handle client disconnect/stop generation
-                                break
+                    except Exception as e:
+                        # Fallback to gemini streaming
+                        if gemini_model:
+                            fallback_msg = f"[Local model failed, switching to gemini: {str(e)}]\n"
+                            bot_reply += fallback_msg
+                            yield f"data: {json.dumps({'type': 'chunk', 'text': fallback_msg})}\n\n"
+                            try:
+                                response = gemini_model.generate_content(
+                                    combined_input,
+                                    stream=True
+                                )
+                                for chunk in response:
+                                    try:
+                                        chunk_text = chunk.text if chunk.text else ""
+                                        if chunk_text:
+                                            bot_reply += chunk_text
+                                            yield f"data: {json.dumps({'type': 'chunk', 'text': chunk_text})}\n\n"
+                                    except GeneratorExit:
+                                        break
+                            except Exception as ge:
+                                err_txt = f"[Fallback gemini error: {str(ge)}]"
+                                bot_reply += err_txt
+                                yield f"data: {json.dumps({'type': 'error', 'message': err_txt})}\n\n"
+                        else:
+                            err_txt = f"[Local model error and no fallback: {str(e)}]"
+                            bot_reply += err_txt
+                            yield f"data: {json.dumps({'type': 'error', 'message': err_txt})}\n\n"
                                 
                 else:  # Cloud model (Gemini)
                     if model_name == "gemini":
