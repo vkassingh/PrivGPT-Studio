@@ -422,7 +422,7 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [localModels, setLocalModels] = useState<string[]>([]);
   const [cloudModels, setCloudModels] = useState<string[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>("phi3");
+  const [selectedModel, setSelectedModel] = useState<string>("");
   const [selectedModelType, setSelectedModelType] = useState<"local" | "cloud">(
     "local"
   );
@@ -494,21 +494,86 @@ export default function ChatPage() {
   }, [messages]);
 
   useEffect(() => {
-    // Fetch models
     const fetchModels = async () => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/models`
         );
         const data = await response.json();
-        setLocalModels(data.local_models || []);
-        setCloudModels(data.cloud_models || []);
+        const local: string[] = data.local_models || [];
+        const cloud: string[] = data.cloud_models || [];
+        setLocalModels(local);
+        setCloudModels(cloud);
+
+        // Attempt restore from localStorage
+        const storedModel =
+          typeof window !== "undefined"
+            ? localStorage.getItem("selected_model_name")
+            : null;
+        const storedType =
+          (typeof window !== "undefined"
+            ? (localStorage.getItem("selected_model_type") as
+                | "local"
+                | "cloud"
+                | null)
+            : null);
+
+        // Always select the first available model as default
+        let modelToSelect = "";
+        let typeToSelect: "local" | "cloud" = "local";
+
+        // First priority: stored model if still available
+        if (
+          storedModel &&
+          ((storedType === "local" && local.includes(storedModel)) ||
+            (storedType === "cloud" && cloud.includes(storedModel)))
+        ) {
+          modelToSelect = storedModel;
+          typeToSelect = storedType as "local" | "cloud";
+        } else if (local.length > 0) {
+          modelToSelect = local[0];
+          typeToSelect = "local";
+        } else if (cloud.length > 0) {
+          modelToSelect = cloud[0];
+          typeToSelect = "cloud";
+        }
+
+        // Set the selected model
+        if (modelToSelect) {
+          setSelectedModel(modelToSelect);
+          setSelectedModelType(typeToSelect);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("selected_model_name", modelToSelect);
+            localStorage.setItem("selected_model_type", typeToSelect);
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch models:", error);
       }
     };
     fetchModels();
   }, []);
+
+  const fallbackToGemini = (errorText: string) => {
+    const geminiAvailable = cloudModels.includes("gemini");
+    if (geminiAvailable) {
+      toast.error(
+        `Local model unavailable. Switched to Gemini. Error: ${errorText}`
+      );
+      setSelectedModel("gemini");
+      setSelectedModelType("cloud");
+      try {
+        localStorage.setItem("selected_model_name", "gemini");
+        localStorage.setItem("selected_model_type", "cloud");
+      } catch (e) {
+        /* ignore */
+      }
+    } else {
+      toast.error(
+        `Local model unavailable and Gemini not configured. Error: ${errorText}`
+      );
+    }
+  };
 
   useEffect(() => {
     const fetchChatSessionHistory = async () => {
@@ -654,6 +719,18 @@ export default function ChatPage() {
   const handleSend = async () => {
     if (!input.trim()) return;
 
+    // Check if a model is selected
+    if (!selectedModel || selectedModel.trim() === "") {
+      toast.error("Please select a model before sending a message.");
+      return;
+    }
+
+    // Check if models are loaded
+    if (localModels.length === 0 && cloudModels.length === 0) {
+      toast.error("Loading models... Please wait a moment and try again.");
+      return;
+    }
+
     // remove backslashes added by react-mentions markup
     const unescapedInput = input.replace(/\\([\[\]\(\)])/g, "$1");
 
@@ -736,6 +813,18 @@ export default function ChatPage() {
           timestamp: new Date(data.timestamp),
         };
 
+        // Fallback detection for local model failures
+        if (data.fallback_used) {
+          fallbackToGemini(bot_response);
+        } else if (
+          bot_response.toLowerCase().includes("local model error") ||
+          bot_response.toLowerCase().includes("connection refused") ||
+          bot_response.toLowerCase().includes("failed to establish")
+        ) {
+          // If server didn't auto fallback (e.g., streaming disabled), try client side
+          fallbackToGemini(bot_response);
+        }
+
         if (
           newChatSessionBtnRef.current &&
           newChatSessionBtnRef.current.disabled
@@ -812,6 +901,10 @@ export default function ChatPage() {
                     } else {
                       streamedContent += data.text;
                     }
+                    // Detect server-sent fallback marker
+                    if (data.text && data.text.includes("[Local model failed, switching to gemini")) {
+                      fallbackToGemini("Local model failed during streaming");
+                    }
                     // Update the temporary message with streamed content
                     setMessages((prev) =>
                       prev.map((msg) =>
@@ -877,6 +970,16 @@ export default function ChatPage() {
         newChatSessionBtnRef.current.disabled
       ) {
         newChatSessionBtnRef.current.disabled = false;
+      }
+
+      // Fallback detection after streaming
+      if (
+        streamedContent &&
+        (streamedContent.toLowerCase().includes("local model error") ||
+          streamedContent.toLowerCase().includes("connection refused") ||
+          streamedContent.toLowerCase().includes("failed to establish"))
+      ) {
+        fallbackToGemini(streamedContent);
       }
 
       setIsStreaming(false);
@@ -1514,7 +1617,7 @@ export default function ChatPage() {
               }}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select a model..." />
               </SelectTrigger>
               <SelectContent>
                 <div className="px-2 py-1 text-xs text-muted-foreground">
