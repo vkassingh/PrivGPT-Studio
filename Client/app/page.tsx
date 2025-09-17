@@ -288,60 +288,72 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-center mb-12">
             See It In Action
           </h2>
-          <div className="max-w-2xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Live Chat Demo</span>
+          <div className="w-full flex justify-center">
+            <Card className="w-full max-w-4xl shadow-xl border-2 border-primary/20">
+              <CardHeader className="bg-primary/10 rounded-t-lg">
+                <CardTitle className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span className="font-semibold">Live Chat Demo</span>
+                  </span>
                   <Badge variant="secondary">Gemini Model</Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4 h-64 overflow-y-auto bg-muted/30 rounded-lg p-4">
+              <CardContent className="bg-background rounded-b-lg">
+                <div className="flex flex-col gap-2 h-72 overflow-y-auto bg-muted/30 rounded-lg p-4 border border-muted-foreground/10">
+                  {/* User message */}
                   <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
+                    <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2 max-w-xs shadow-md text-right">
                       Give me 3 fun facts about space.
                     </div>
                   </div>
+                  {/* Bot message */}
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-3 py-2 max-w-xs whitespace-pre-wrap">
+                    <div className="bg-muted rounded-2xl px-4 py-2 max-w-xs shadow text-left">
                       <div className="prose prose-sm dark:prose-invert">
-                        1. A day on Venus is longer than its year<br></br>
-                        2. Neutron stars can spin 600 times/sec<br></br>
+                        1. A day on Venus is longer than its year<br />
+                        2. Neutron stars can spin 600 times/sec<br />
                         3. Space isn't completely silent!
                       </div>
                     </div>
                   </div>
+                  {/* User message */}
                   <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
+                    <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2 max-w-xs shadow-md text-right">
                       Explain AI like I'm 5.
                     </div>
                   </div>
+                  {/* Bot message */}
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-3 py-2 max-w-xs">
-                      It's like a super-smart robot brain that learns by looking
-                      at patterns!
+                    <div className="bg-muted rounded-2xl px-4 py-2 max-w-xs shadow text-left">
+                      It's like a super-smart robot brain that learns by looking at patterns!
                     </div>
                   </div>
+                  {/* User message */}
                   <div className="flex justify-end">
-                    <div className="bg-primary text-primary-foreground rounded-lg px-3 py-2 max-w-xs">
+                    <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2 max-w-xs shadow-md text-right">
                       Write a one-line love poem.
                     </div>
                   </div>
+                  {/* Bot message */}
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-3 py-2 max-w-xs whitespace-pre-wrap">
+                    <div className="bg-muted rounded-2xl px-4 py-2 max-w-xs shadow text-left">
                       Your smile rewrites the code in my heart.
                     </div>
                   </div>
+                  {/* Typing indicator */}
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-3 py-2 max-w-xs">
-                      <div className="animate-pulse">Typing...</div>
+                    <div className="bg-muted rounded-2xl px-4 py-2 max-w-xs shadow text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="animate-pulse w-2 h-2 bg-primary rounded-full"></span>
+                        <span className="animate-pulse">Typing...</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 text-center">
+                <div className="mt-6 flex justify-center">
                   <Link href="/chat">
-                    <Button>Try It Yourself</Button>
+                    <Button size="lg" className="px-8">Try It Yourself</Button>
                   </Link>
                 </div>
               </CardContent>
