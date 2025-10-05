@@ -20,7 +20,7 @@ export default function footer() {
                 width={290}
                 height={53}
                 priority
-                className="w-[240px] h-auto"
+                className="w-[220px] h-auto"
               />
             </Link>
 

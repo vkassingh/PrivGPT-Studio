@@ -33,8 +33,9 @@ export default function header() {
             src={darkMode ? "/logos/logo-dark.svg" : "/logos/logo-light.svg"}
             alt="PrivGPT Studio Logo"
             width={290}
-            height={53}
+            height={43}
             priority
+            className="w-[220px] h-auto"
           />
         </Link>
 
