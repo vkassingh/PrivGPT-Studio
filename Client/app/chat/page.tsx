@@ -76,6 +76,8 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import Head from "next/head";
+import Image from "next/image";
+import { useTheme } from "@/components/theme-provider";
 
 interface Message {
   id: string;
@@ -99,6 +101,8 @@ interface UploadedFile {
 }
 
 export default function ChatPage() {
+  const { darkMode } = useTheme();
+
   // Loading dots animation component
   const LoadingDots = () => {
     const [dots, setDots] = useState(".");
@@ -1427,14 +1431,17 @@ export default function ChatPage() {
           }`}
         >
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl  font-bold lg:block">
-                PrivGPT Studio
-              </span>
-            </Link>
+            <Link href="/">
+              <Image
+                src={darkMode ? "/logos/logo-dark.svg" : "/logos/logo-light.svg"}
+                alt="PrivGPT Studio Logo"
+                width={290}
+                height={53}
+                priority
+                className="w-[220px] h-auto"
+              />
+              </Link>
+
             <div className="flex items-center space-x-2">
               <ThemeToggle />
               {/* Desktop close button */}

@@ -12,7 +12,15 @@ export const metadata: Metadata = {
   description:
     "Experience the future of AI conversations with both cloud-powered Gemini and privacy-focused local models",
   icons: {
-    icon: "/logo.png",
+    icon: "/logos/logo-icon-light.svg",
+
+    other: [
+      {
+        rel: 'icon',
+        url: '/logos/logo-icon-dark.svg',
+        media: '(prefers-color-scheme: dark)', 
+      },
+    ],
   },
 };
 

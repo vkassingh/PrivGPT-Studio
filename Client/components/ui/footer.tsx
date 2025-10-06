@@ -2,19 +2,28 @@
 
 import { Zap, Star, Github, Twitter, Mail, Menu } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { useTheme } from "@/components/theme-provider";
 
 export default function footer() {
+  const { darkMode } = useTheme();
   return (
     <footer className="border-t py-12 px-4">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-4">
-            <div className="flex items-center space-x-2 mb-4 md:mb-6">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold">PrivGPT Studio</span>
-            </div>
+
+            <Link href="/" className="flex items-center">
+              <Image
+                src={darkMode ? "/logos/logo-dark.svg" : "/logos/logo-light.svg"}
+                alt="PrivGPT Studio Logo"
+                width={290}
+                height={53}
+                priority
+                className="w-[220px] h-auto"
+              />
+            </Link>
+
             <p className="text-muted-foreground">
               The future of AI conversations, powered by both cloud and local
               models.
