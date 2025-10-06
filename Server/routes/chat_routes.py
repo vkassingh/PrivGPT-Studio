@@ -420,7 +420,8 @@ def chat_history():
     for session in sessions:
         session["_id"] = str(session["_id"])
         for msg in session.get("messages", []):
-            msg["timestamp"] = msg["timestamp"].isoformat()
+            if hasattr(msg["timestamp"], "isoformat"):
+                msg["timestamp"] = msg["timestamp"].isoformat()
         result.append(session)
 
     return jsonify(result)
