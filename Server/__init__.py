@@ -21,7 +21,7 @@ def create_app():
     # configure the gemini model
     genai.configure(api_key=Config.GEMINI_API_KEY)
     global gemini_model
-    gemini_model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
+    gemini_model = genai.GenerativeModel("models/gemini-2.5-flash")
 
     # blueprint imports
     from Server.routes.db import db_bp
