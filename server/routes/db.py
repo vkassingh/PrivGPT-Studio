@@ -1,5 +1,5 @@
 from flask import Blueprint
-from Server import mongo
+from server import mongo
 
 db_bp = Blueprint('db', __name__)
 
