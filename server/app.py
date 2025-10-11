@@ -3,7 +3,7 @@ import google.generativeai as genai
 import sys
 # Add parent directory to Python path to allow Server module import
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from Server import create_app
+from server import create_app
 # Initialize Flask app
 app = create_app()
 # list available models
