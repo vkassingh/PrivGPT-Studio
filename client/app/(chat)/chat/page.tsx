@@ -1970,6 +1970,7 @@ export default function ChatPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setClearChatSessionModal(true)}
+                className="hover:bg-destructive hover:text-destructive-foreground transition-colors"
               >
                 <Eraser className="w-4 h-4 mr-1" />
                 Clear Chat
@@ -1978,6 +1979,7 @@ export default function ChatPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setExportChatSessionModal(true)}
+                className="hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <Download className="w-4 h-4 mr-1" />
                 Export Chat
