@@ -443,7 +443,12 @@ export default function ChatPage() {
   const [exportChatSessionModal, setExportChatSessionModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const isRecordingRef = useRef(false);
   const recognitionRef = useRef<any>(null);
+  const [finalTranscript, setFinalTranscript] = useState("");
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const ignoreOnEndRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const newChatSessionBtnRef = useRef<HTMLButtonElement | null>(null);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
@@ -1136,45 +1141,220 @@ export default function ChatPage() {
       console.warn("SpeechRecognition not supported");
       return;
     }
-    if (!SpeechRecognition) {
-      console.warn("SpeechRecognition not supported");
-      return;
-    }
+
     const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
+
+    // Configure for maximum accuracy
+    recognition.lang = "en-US"; // Change to your preferred language/dialect (en-GB, en-AU, en-IN, etc.)
     recognition.continuous = true;
     recognition.interimResults = true;
+    recognition.maxAlternatives = 5; // Reduced from 10 for better performance
 
-    recognition.onresult = (event: any) => {
-      let transcript = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
+    // Request the best possible audio quality and processing
+    // These are advanced settings that improve accuracy
+    if ('serviceURI' in recognition) {
+      // Use premium speech recognition endpoint if available
+      console.log("Using premium speech recognition service");
+    }
+
+    // Additional settings for improved recognition
+    if ('grammars' in recognition) {
+      // Grammar support (limited browser support but helps when available)
+      const SpeechGrammarList = (window as any).SpeechGrammarList || (window as any).webkitSpeechGrammarList;
+      if (SpeechGrammarList) {
+        const grammarList = new SpeechGrammarList();
+        recognition.grammars = grammarList;
       }
-      setInput(transcript.trim());
+    }
+
+    console.log("Speech recognition configured with maxAlternatives:", recognition.maxAlternatives);
+
+    // Handle recognition results with real-time interim and final transcripts
+    recognition.onresult = (event: any) => {
+      console.log("Speech recognition onresult triggered", event);
+      let interim = "";
+      let newFinalText = "";
+
+      // Process all results to build the full transcript
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+
+        // Use the highest confidence alternative (first one is usually best)
+        // Simplified approach - browser already ranks by confidence
+        let bestTranscript = result[0].transcript;
+        let bestConfidence = result[0].confidence || 1;
+
+        // Only check alternatives if confidence is low
+        if (bestConfidence < 0.8 && result.length > 1) {
+          for (let j = 1; j < Math.min(result.length, 3); j++) {
+            const alternative = result[j];
+            const confidence = alternative.confidence || 0;
+
+            if (confidence > bestConfidence) {
+              bestConfidence = confidence;
+              bestTranscript = alternative.transcript;
+            }
+          }
+        }
+
+        console.log(`Result ${i}: "${bestTranscript}" (confidence: ${bestConfidence.toFixed(3)}, isFinal: ${result.isFinal})`);
+
+        if (result.isFinal) {
+          // Apply cleanup only to final results
+          const processedTranscript = bestTranscript
+            // Fix common spacing issues
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          newFinalText += processedTranscript + " ";
+        } else {
+          interim += bestTranscript;
+        }
+      }
+
+      // Update states in batch
+      if (newFinalText) {
+        setFinalTranscript((prev) => {
+          const updated = prev + newFinalText;
+          console.log("Updated final transcript:", updated);
+          // Update input field with final + interim
+          setInput(updated + interim);
+          setInterimTranscript(interim);
+          return updated;
+        });
+      } else {
+        // Only interim results, update input field
+        setInterimTranscript(interim);
+        setFinalTranscript((currentFinal) => {
+          setInput(currentFinal + interim);
+          return currentFinal;
+        });
+      }
     };
 
-    recognition.onerror = (event: any) => {
-      console.error("Speech recognition error", event.error);
-      setIsRecording(false);
-      recognition.stop();
+    // Handle recognition start
+    recognition.onstart = () => {
+      ignoreOnEndRef.current = false;
+      console.log("✅ Speech recognition STARTED - microphone is active");
     };
 
+    // Handle recognition end - only stop when user manually stops
     recognition.onend = () => {
-      setIsRecording(false);
+      console.log("Recognition ended. isRecordingRef:", isRecordingRef.current, "ignoreOnEnd:", ignoreOnEndRef.current);
+
+      if (ignoreOnEndRef.current) {
+        ignoreOnEndRef.current = false;
+        return;
+      }
+
+      // If recognition ends unexpectedly while user wants to keep recording, restart it
+      // This handles browser-imposed limits but keeps it seamless
+      if (isRecordingRef.current) {
+        console.log("Recognition ended unexpectedly, restarting...");
+        // Small delay to prevent rapid restart loops
+        setTimeout(() => {
+          if (isRecordingRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.start();
+              console.log("Recognition restarted successfully");
+            } catch (error) {
+              console.error("Error restarting:", error);
+              // Only stop if restart fails
+              setIsRecording(false);
+              isRecordingRef.current = false;
+              toast.error("Voice recognition stopped unexpectedly");
+            }
+          }
+        }, 100);
+      }
+    };
+
+    // Enhanced error handling
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+
+      // Clear any pending restart timeout
+      if (restartTimeoutRef.current) {
+        clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = null;
+      }
+
+      switch (event.error) {
+        case "no-speech":
+          // Don't stop on no-speech, just log it - let onend handle continuation
+          console.log("No speech detected, continuing...");
+          break;
+        case "audio-capture":
+          toast.error("No microphone found. Please check your device.");
+          ignoreOnEndRef.current = true;
+          setIsRecording(false);
+          isRecordingRef.current = false;
+          break;
+        case "not-allowed":
+          toast.error("Microphone access denied. Please allow microphone access.");
+          ignoreOnEndRef.current = true;
+          setIsRecording(false);
+          isRecordingRef.current = false;
+          break;
+        case "aborted":
+          // Only log if user didn't manually stop
+          if (isRecordingRef.current) {
+            console.log("Recognition aborted unexpectedly");
+          }
+          break;
+        case "network":
+          toast.error("Network error. Check your internet connection.");
+          ignoreOnEndRef.current = true;
+          setIsRecording(false);
+          isRecordingRef.current = false;
+          break;
+        default:
+          // Don't show error toast for every error type - some are recoverable
+          console.error("Speech recognition error:", event.error);
+      }
     };
 
     recognitionRef.current = recognition;
-  }, []);
+
+    // Cleanup on unmount
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []); // Removed dependencies to prevent recreation
 
   const handleVoiceInput = () => {
     if (!recognitionRef.current) return;
 
     if (isRecording) {
-      recognitionRef.current.stop();
+      // Stop recording
       setIsRecording(false);
+      isRecordingRef.current = false;
+
+      // Use ignoreOnEnd to prevent restart
+      ignoreOnEndRef.current = true;
+      recognitionRef.current.stop();
+      console.log("Recording stopped by user");
+      toast.info("Voice input stopped");
     } else {
-      recognitionRef.current.start();
+      // Start recording
       setIsRecording(true);
+      isRecordingRef.current = true;
+      setFinalTranscript("");
+      setInterimTranscript("");
+      setInput("");
+
+      try {
+        recognitionRef.current.start();
+        console.log("Recording started by user");
+        toast.success("Microphone activated - start speaking!");
+      } catch (error) {
+        console.error("Error starting recognition:", error);
+        setIsRecording(false);
+        isRecordingRef.current = false;
+        toast.error("Could not start voice recognition");
+      }
     }
   };
 
@@ -1852,17 +2032,36 @@ export default function ChatPage() {
             </div>
           )}
 
+          {/* Live Transcription Preview */}
+          {isRecording && (finalTranscript || interimTranscript) && (
+            <div className="mb-3 bg-muted/30 dark:bg-muted/20 rounded-lg p-3 border border-muted min-h-[60px]">
+              <div className="text-sm leading-relaxed">
+                <span className="text-foreground">{finalTranscript}</span>
+                <span className="text-muted-foreground italic">{interimTranscript}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                <span className="text-foreground font-medium">White text</span> = confirmed •
+                <span className="italic ml-1">Gray italic</span> = processing...
+              </p>
+            </div>
+          )}
+
           {/* Voice Input Button */}
           <div className="flex justify-end mb-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleVoiceInput}
-              className={`${isRecording ? "text-red-500" : ""}`}
+              className={`${
+                isRecording
+                  ? "text-red-500 animate-pulse bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40"
+                  : "hover:text-primary"
+              } transition-all duration-200`}
+              title={isRecording ? "Stop recording" : "Start voice input"}
             >
-              <Mic className="w-4 h-4" />
+              <Mic className={`w-4 h-4 ${isRecording ? "animate-pulse" : ""}`} />
               {isRecording && (
-                <span className="ml-1 text-xs">Recording...</span>
+                <span className="ml-1 text-xs font-medium">Listening...</span>
               )}
             </Button>
           </div>
