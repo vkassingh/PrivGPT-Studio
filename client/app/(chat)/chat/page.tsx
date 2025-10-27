@@ -2039,10 +2039,6 @@ export default function ChatPage() {
                 <span className="text-foreground">{finalTranscript}</span>
                 <span className="text-muted-foreground italic">{interimTranscript}</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                <span className="text-foreground font-medium">White text</span> = confirmed •
-                <span className="italic ml-1">Gray italic</span> = processing...
-              </p>
             </div>
           )}
 
