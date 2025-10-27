@@ -2032,16 +2032,6 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* Live Transcription Preview */}
-          {isRecording && (finalTranscript || interimTranscript) && (
-            <div className="mb-3 bg-muted/30 dark:bg-muted/20 rounded-lg p-3 border border-muted min-h-[60px]">
-              <div className="text-sm leading-relaxed">
-                <span className="text-foreground">{finalTranscript}</span>
-                <span className="text-muted-foreground italic">{interimTranscript}</span>
-              </div>
-            </div>
-          )}
-
           {/* Voice Input Button */}
           <div className="flex justify-end mb-2">
             <Button
@@ -2080,63 +2070,78 @@ export default function ChatPage() {
               <Plus className="w-4 h-4" />
             </Button>
 
-            {chatSessionSuggestions.length > 0 ? (
-              <MentionsInput
-                value={input}
-                onChange={(_event, newValue) => setInput(newValue)}
-                placeholder="Type your message and use @ to mention chats..."
-                style={{
-                  control: {
-                    backgroundColor: "transparent",
-                    fontSize: 14,
-                  },
-                  highlighter: {
-                    padding: "0.5rem 0.75rem",
-                    border: "none",
-                  },
-                  input: {
-                    padding: "0.5rem 0.75rem",
-                    border: "none",
-                    outline: "none",
-                    backgroundColor: "transparent",
-                  },
-                  suggestions: {
-                    list: {
-                      backgroundColor: "white",
-                      border: "1px solid rgba(0,0,0,0.15)",
+            <div className="relative flex-1">
+              {/* Styled overlay with color-coded transcription text */}
+              {isRecording && (finalTranscript || interimTranscript) && (
+                <div className="absolute inset-0 p-2 px-3 pointer-events-none overflow-auto z-10 flex items-start">
+                  <div className="text-sm leading-relaxed whitespace-pre-wrap break-words w-full pt-[2px]">
+                    <span className="text-foreground">{finalTranscript}</span>
+                    <span className="text-muted-foreground italic">{interimTranscript}</span>
+                  </div>
+                </div>
+              )}
+
+              {chatSessionSuggestions.length > 0 ? (
+                <MentionsInput
+                  value={input}
+                  onChange={(_event, newValue) => setInput(newValue)}
+                  placeholder="Type your message and use @ to mention chats..."
+                  style={{
+                    control: {
+                      backgroundColor: "transparent",
                       fontSize: 14,
                     },
-                    item: {
-                      padding: "5px 15px",
-                      "&focused": {
-                        backgroundColor: "#f5f5f5",
+                    highlighter: {
+                      padding: "0.5rem 0.75rem",
+                      border: "none",
+                    },
+                    input: {
+                      padding: "0.5rem 0.75rem",
+                      border: "none",
+                      outline: "none",
+                      backgroundColor: "transparent",
+                      color: isRecording ? "transparent" : undefined,
+                    },
+                    suggestions: {
+                      list: {
+                        backgroundColor: "white",
+                        border: "1px solid rgba(0,0,0,0.15)",
+                        fontSize: 14,
+                      },
+                      item: {
+                        padding: "5px 15px",
+                        "&focused": {
+                          backgroundColor: "#f5f5f5",
+                        },
                       },
                     },
-                  },
-                }}
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-input disabled:cursor-not-allowed disabled:opacity-50"
-                onKeyDown={handleKeyPress}
-              >
-                <Mention
-                  trigger="@"
-                  markup="@\[__display__\]\(__id__\)"
-                  data={chatSessionSuggestions}
-                  displayTransform={(id: string, display: string) =>
-                    `@${display}`
-                  }
-                  style={{ backgroundColor: "#e0e2e4" }}
-                  appendSpaceOnAdd
+                  }}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:border-input disabled:cursor-not-allowed disabled:opacity-50"
+                  onKeyDown={handleKeyPress}
+                >
+                  <Mention
+                    trigger="@"
+                    markup="@\[__display__\]\(__id__\)"
+                    data={chatSessionSuggestions}
+                    displayTransform={(id: string, display: string) =>
+                      `@${display}`
+                    }
+                    style={{ backgroundColor: "#e0e2e4" }}
+                    appendSpaceOnAdd
+                  />
+                </MentionsInput>
+              ) : (
+                <Textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Type your message in markdown..."
+                  className={`flex-1 resize-none min-h-[80px] ${
+                    isRecording ? "text-transparent caret-foreground" : ""
+                  }`}
                 />
-              </MentionsInput>
-            ) : (
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="Type your message in markdown..."
-                className="flex-1 resize-none min-h-[80px]"
-              />
-            )}
+              )}
+            </div>
             {isStreaming ? (
               <Button
                 onClick={stopGeneration}
