@@ -42,6 +42,8 @@ import {
   Download,
   Eraser,
   Mic,
+  Volume2,
+  Copy,
   Plus,
   X,
   FileText,
@@ -123,21 +125,98 @@ export default function ChatPage() {
   };
 
   // Add this component inside your ChatPage component, before the return statement
+  // Helper to wrap text nodes with highlighting spans
+  const wrapTextWithHighlight = (text: string, charIndex: number) => {
+    // If charIndex is -1, no highlighting (just return the text wrapped in spans)
+    const shouldHighlight = charIndex >= 0;
+
+    const segments: Array<{ text: string; start: number; end: number }> = [];
+    let pos = 0;
+
+    // Split into words and whitespace while preserving position
+    text.split(/(\s+)/).forEach((segment) => {
+      if (segment.length > 0) {
+        const start = pos;
+        const end = pos + segment.length;
+        segments.push({ text: segment, start, end });
+        pos = end;
+      }
+    });
+
+    return (
+      <>
+        {segments.map((segment, index) => {
+          const isCurrentWord = shouldHighlight && charIndex >= segment.start && charIndex < segment.end && /\S/.test(segment.text);
+          return (
+            <span
+              key={index}
+              className={`transition-colors duration-150 ${
+                isCurrentWord
+                  ? 'bg-sky-100/90 dark:bg-sky-300/40 rounded px-0.5'
+                  : ''
+              }`}
+            >
+              {segment.text}
+            </span>
+          );
+        })}
+      </>
+    );
+  };
+
   const MessageContent = ({
     content,
     isLoading,
     isUser = false,
+    isSpeakingThis = false,
+    currentCharIndex = 0,
+    spokenText = "",
   }: {
     content: string;
     isLoading?: boolean;
     isUser?: boolean;
+    isSpeakingThis?: boolean;
+    currentCharIndex?: number;
+    spokenText?: string;
   }) => {
     if (isLoading || content === "...") {
       return <LoadingDots />;
     }
 
+    // If TTS is active, render the stripped text with word highlighting and preserved line breaks
+    if (isSpeakingThis && spokenText) {
+      const lines = spokenText.split('\n');
+      let globalCharOffset = 0;
+
+      return (
+        <div className="markdown-content">
+          {lines.map((line, lineIndex) => {
+            const lineStart = globalCharOffset;
+            const lineEnd = globalCharOffset + line.length;
+
+            // Calculate relative position for highlighting within this line
+            const relativeCharIndex = currentCharIndex >= lineStart && currentCharIndex < lineEnd
+              ? currentCharIndex - lineStart
+              : -1; // -1 means no highlighting in this line
+
+            const lineElement = line.length > 0
+              ? wrapTextWithHighlight(line, relativeCharIndex)
+              : <span>&nbsp;</span>;
+
+            globalCharOffset = lineEnd + 1; // +1 for the newline character
+
+            return (
+              <div key={lineIndex} className="mb-3 leading-relaxed text-gray-800 dark:text-gray-200">
+                {lineElement}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
     return (
-      <div className="markdown-content">
+      <div className="markdown-content" data-speaking={isSpeakingThis ? "true" : "false"}>
         <Head>
           <title>
             AI Chat | PrivGPT Studio - Chat with Local & Cloud AI Models
@@ -461,6 +540,19 @@ export default function ChatPage() {
     useState<AbortController | null>(null);
   const [streamingEnabled, setStreamingEnabled] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Text-to-Speech (Web Speech API)
+  const [speechSupported, setSpeechSupported] = useState<boolean>(false);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] =
+    useState<SpeechSynthesisVoice | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(
+    null
+  );
+  const [currentCharIndex, setCurrentCharIndex] = useState<number>(0);
+  const [spokenText, setSpokenText] = useState<string>("");
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const canceledByUserRef = useRef<boolean>(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 4000);
@@ -482,6 +574,182 @@ export default function ChatPage() {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Initialize Web Speech API (TTS)
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      "speechSynthesis" in window &&
+      "SpeechSynthesisUtterance" in window
+    ) {
+      setSpeechSupported(true);
+      const loadVoices = () => {
+        const v = window.speechSynthesis.getVoices();
+        setVoices(v);
+        if (!selectedVoice && v.length > 0) {
+          const preferred =
+            v.find(
+              (voice) =>
+                voice.lang.toLowerCase().startsWith("en") &&
+                /google.*english|microsoft.*english/i.test(voice.name)
+            ) ||
+            v.find((voice) => voice.lang.toLowerCase().startsWith("en")) ||
+            v[0];
+          setSelectedVoice(preferred || null);
+        }
+      };
+
+      // Some browsers populate voices async
+      loadVoices();
+      const onChange = () => loadVoices();
+      (window.speechSynthesis as any).onvoiceschanged = onChange;
+
+      return () => {
+        (window.speechSynthesis as any).onvoiceschanged = null;
+      };
+    } else {
+      setSpeechSupported(false);
+    }
+  }, [selectedVoice]);
+
+  // Utility: strip markdown and code for clearer TTS
+  const stripMarkdown = (md: string) => {
+    if (!md) return "";
+    let text = md;
+
+    // Remove code blocks first
+    text = text.replace(/```[\s\S]*?```/g, ""); // remove fenced code blocks
+    text = text.replace(/`[^`]*?`/g, ""); // remove inline code
+
+    // Remove images
+    text = text.replace(/!\[[^\]]*\]\([^\)]*\)/g, "");
+
+    // Convert links to text (keep the link text, discard URL)
+    text = text.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, "$1");
+
+    // Remove specific markdown formatting patterns (most specific first)
+    text = text.replace(/\*\*\*(.+?)\*\*\*/gs, "$1"); // ***bold italic***
+    text = text.replace(/___(.+?)___/gs, "$1"); // ___bold italic___
+    text = text.replace(/\*\*(.+?)\*\*/gs, "$1"); // **bold**
+    text = text.replace(/__(.+?)__/gs, "$1"); // __bold__
+    text = text.replace(/\*(.+?)\*/gs, "$1"); // *italic*
+    text = text.replace(/_(.+?)_/gs, "$1"); // _italic_
+    text = text.replace(/~~(.+?)~~/gs, "$1"); // ~~strikethrough~~
+
+    // Remove headers (# symbols at start of line)
+    text = text.replace(/^#{1,6}\s+/gm, "");
+
+    // Remove blockquote markers
+    text = text.replace(/^>\s+/gm, "");
+
+    // Remove horizontal rules
+    text = text.replace(/^(\*{3,}|-{3,}|_{3,})$/gm, "");
+
+    // Preserve line breaks but collapse other consecutive whitespace
+    text = text.replace(/[^\S\n]+/g, " "); // collapse spaces/tabs but not newlines
+    text = text.replace(/ *\n */g, "\n"); // clean up spaces around newlines
+
+    return text.trim();
+  };
+
+  const stopSpeech = () => {
+    try {
+      canceledByUserRef.current = true;
+      if (speechSupported) {
+        window.speechSynthesis.cancel();
+      }
+    } finally {
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+      setCurrentCharIndex(0);
+      setSpokenText("");
+      utteranceRef.current = null;
+    }
+  };
+
+  const speakText = (text: string, messageId: string) => {
+    if (!speechSupported) {
+      toast.error("Text-to-Speech not supported in this browser.");
+      return;
+    }
+    // Cancel any ongoing speech and start fresh
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    canceledByUserRef.current = false;
+    if (selectedVoice) utterance.voice = selectedVoice;
+    utterance.rate = 1.05; // slightly faster for responsiveness
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setSpeakingMessageId(messageId);
+      setSpokenText(text);
+      setCurrentCharIndex(0);
+    };
+
+    utterance.onboundary = (event: SpeechSynthesisEvent) => {
+      if (event.name === 'word') {
+        setCurrentCharIndex(event.charIndex);
+      }
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+      setCurrentCharIndex(0);
+      setSpokenText("");
+      utteranceRef.current = null;
+      canceledByUserRef.current = false;
+    };
+    utterance.onerror = (e: any) => {
+      const code = e?.error || e?.name || "";
+      const wasCanceled = canceledByUserRef.current || code === "canceled" || code === "interrupted";
+      if (!wasCanceled) {
+        console.error("TTS error:", e);
+        toast.error("Failed to speak the message.");
+      }
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+      setCurrentCharIndex(0);
+      setSpokenText("");
+      utteranceRef.current = null;
+      canceledByUserRef.current = false;
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSpeakClick = (message: Message) => {
+    if (message.role !== "assistant") return;
+    if (message.content === "...") return; // don't read loading placeholder
+
+    if (isSpeaking && speakingMessageId === message.id) {
+      // toggle stop if already speaking this message
+      stopSpeech();
+      return;
+    }
+
+    const plain = stripMarkdown(message.content);
+    if (!plain) {
+      toast.error("Nothing to read aloud.");
+      return;
+    }
+    speakText(plain, message.id);
+  };
+
+  // Cleanup on unmount: stop any ongoing speech
+  useEffect(() => {
+    return () => {
+      try {
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+        }
+      } catch {}
+    };
   }, []);
 
   const stopGeneration = () => {
@@ -648,22 +916,31 @@ export default function ChatPage() {
           const activeSession =
             sessions.find((s: any) => s._id === sessionId) || sessions[0];
           const formattedMessages: Message[] = activeSession.messages?.map(
-            (msg: any, index: number) => ({
-              id: msg.id || (index + 2).toString(),
-              content: msg.content,
-              role: msg.role,
-              timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
-              ...(msg.uploaded_file
-                ? {
-                    file: {
-                      name: msg.uploaded_file.name,
-                      size: msg.uploaded_file.size,
-                      type: msg.uploaded_file.type,
-                      file: msg.uploaded_file.file,
-                    } as UploadedFile,
-                  }
-                : {}),
-            })
+            (msg: any, index: number) => {
+              const normalizedRole: "user" | "assistant" =
+                msg.role === "user"
+                  ? "user"
+                  : msg.role === "assistant" || msg.role === "bot"
+                  ? "assistant"
+                  : "assistant";
+
+              return {
+                id: msg.id || (index + 2).toString(),
+                content: msg.content,
+                role: normalizedRole,
+                timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date(),
+                ...(msg.uploaded_file
+                  ? {
+                      file: {
+                        name: msg.uploaded_file.name,
+                        size: msg.uploaded_file.size,
+                        type: msg.uploaded_file.type,
+                        file: msg.uploaded_file.file,
+                      } as UploadedFile,
+                    }
+                  : {}),
+              };
+            }
           );
 
           // ✅ Put welcomeMessage on top of history
@@ -1403,22 +1680,31 @@ export default function ChatPage() {
       const data = await response.json();
 
       const formattedMessages: Message[] = data.messages.map(
-        (msg: any, index: number) => ({
-          id: msg.id || `${Date.now()}-${index}`,
-          content: msg.content,
-          role: msg.role,
-          timestamp: new Date(msg.timestamp),
-          ...(msg.uploaded_file
-            ? {
-                file: {
-                  name: msg.uploaded_file.name,
-                  size: msg.uploaded_file.size,
-                  type: msg.uploaded_file.type,
-                  file: msg.uploaded_file.file,
-                } as UploadedFile,
-              }
-            : {}),
-        })
+        (msg: any, index: number) => {
+          const normalizedRole: "user" | "assistant" =
+            msg.role === "user"
+              ? "user"
+              : msg.role === "assistant" || msg.role === "bot"
+              ? "assistant"
+              : "assistant"; // default unknown roles to assistant
+
+          return {
+            id: msg.id || `${Date.now()}-${index}`,
+            content: msg.content,
+            role: normalizedRole,
+            timestamp: new Date(msg.timestamp),
+            ...(msg.uploaded_file
+              ? {
+                  file: {
+                    name: msg.uploaded_file.name,
+                    size: msg.uploaded_file.size,
+                    type: msg.uploaded_file.type,
+                    file: msg.uploaded_file.file,
+                  } as UploadedFile,
+                }
+              : {}),
+          };
+        }
       );
 
       const newWelcomeMessage: Message = {
@@ -1949,39 +2235,91 @@ export default function ChatPage() {
                     {message.role === "user" ? "U" : "AI"}
                   </AvatarFallback>
                 </Avatar>
-                <div
-                  className={`rounded-lg px-4 py-2 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
-                >
-                  {message.file && (
-                    <div className="mt-2 flex items-center space-x-2 bg-muted/50 rounded-lg p-2 max-w-xs mb-3">
-                      {getFileIcon(message.file.type)}
-                      <div>
-                        <p className="text-sm font-medium max-w-[100px] truncate">
-                          {message.file.name}
-                        </p>
-                        <p className="text-[0.6em]">
-                          {formatFileSize(message.file.size)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  <div>
-                    <MessageContent
-                      content={message.content}
-                      isLoading={message.content === "..."}
-                      isUser={message.role === "user"}
-                    />
-                  </div>
-                  <p
-                    suppressHydrationWarning
-                    className="text-xs opacity-70 mt-1"
+                <div className="flex flex-col items-start">
+                  <div
+                    className={`rounded-lg px-4 py-2 ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
+                    }`}
                   >
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
+                    {message.file && (
+                      <div className="mt-2 flex items-center space-x-2 bg-muted/50 rounded-lg p-2 max-w-xs mb-3">
+                        {getFileIcon(message.file.type)}
+                        <div>
+                          <p className="text-sm font-medium max-w-[100px] truncate">
+                            {message.file.name}
+                          </p>
+                          <p className="text-[0.6em]">
+                            {formatFileSize(message.file.size)}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <div>
+                      <MessageContent
+                        content={message.content}
+                        isLoading={message.content === "..."}
+                        isUser={message.role === "user"}
+                        isSpeakingThis={speakingMessageId === message.id}
+                        currentCharIndex={currentCharIndex}
+                        spokenText={spokenText}
+                      />
+                    </div>
+                    <p
+                      suppressHydrationWarning
+                      className="text-xs opacity-70 mt-1"
+                    >
+                      {message.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
+                  {/* Controls under the message bubble (bottom-left) */}
+                  <div className="mt-1 flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Copy message"
+                      aria-label="Copy message"
+                      disabled={!message.content || message.content === "..."}
+                      onClick={() => {
+                        navigator.clipboard
+                          .writeText(message.content)
+                          .then(() => toast.success("Message copied"))
+                          .catch(() => toast.error("Copy failed"));
+                      }}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                    {message.role === "assistant" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={
+                          speakingMessageId === message.id
+                            ? "Stop reading"
+                            : "Read aloud"
+                        }
+                        aria-label={
+                          speakingMessageId === message.id
+                            ? "Stop reading"
+                            : "Read aloud"
+                        }
+                        disabled={!speechSupported || message.content === "..."}
+                        onClick={() => handleSpeakClick(message)}
+                        className={
+                          speakingMessageId === message.id
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : ""
+                        }
+                      >
+                        {speakingMessageId === message.id ? (
+                          <Square className="w-4 h-4" />
+                        ) : (
+                          <Volume2 className="w-4 h-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
